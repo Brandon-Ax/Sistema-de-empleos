@@ -1,0 +1,47 @@
+[
+  {
+    "id": "1",
+    "postulacion_id": "2",
+    "trabajo_id": "2",
+    "usuario_id": "2",
+    "empleador_id": "1",
+    "titulo": "Cocinero",
+    "descripcion": "Cocinar",
+    "pago": "250.49",
+    "horario_trabajo": "Lunes a viernes de 9 am - 2 pm",
+    "ubicacion": "Jr. Caraz",
+    "estado": "activo",
+    "fecha_inicio": "2025-10-29T23:01:06.924870",
+    "fecha_finalizacion": null
+  },
+  {
+    "id": "2",
+    "postulacion_id": "4",
+    "trabajo_id": "3",
+    "usuario_id": "3",
+    "empleador_id": "2",
+    "titulo": "Cocinero",
+    "descripcion": "Saber cocinar",
+    "pago": "250.49",
+    "horario_trabajo": "Lunes a viernes de 9 am - 2 pm",
+    "ubicacion": "Jr. Caraz",
+    "estado": "activo",
+    "fecha_inicio": "2025-11-03T14:26:02.926741",
+    "fecha_finalizacion": null
+  },
+  {
+    "id": "3",
+    "postulacion_id": "5",
+    "trabajo_id": "5",
+    "usuario_id": "3",
+    "empleador_id": "3",
+    "titulo": "Mesero",
+    "descripcion": "Atender a los clientes",
+    "pago": "150",
+    "horario_trabajo": "Lunes a viernes de 9 am - 2 pm",
+    "ubicacion": "Jr. Caraz",
+    "estado": "activo",
+    "fecha_inicio": "2025-11-03T14:55:37.336670",
+    "fecha_finalizacion": null
+  }
+]

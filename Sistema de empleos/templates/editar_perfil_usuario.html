@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Editar Perfil - Usuario</h2>
+        
+        <form method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="nombres">Nombres:</label>
+                    <input type="text" id="nombres" name="nombres" value="{{ usuario.nombres }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellidos">Apellidos:</label>
+                    <input type="text" id="apellidos" name="apellidos" value="{{ usuario.apellidos }}" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono" name="telefono" value="{{ usuario.telefono }}" maxlength="9" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="universidad">Universidad:</label>
+                <input type="text" id="universidad" name="universidad" value="{{ usuario.universidad }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="carrera">Carrera:</label>
+                <input type="text" id="carrera" name="carrera" value="{{ usuario.carrera }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="habilidades">Habilidades:</label>
+                <textarea id="habilidades" name="habilidades" rows="3">{{ usuario.habilidades }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="horario_clases">Horario de Clases:</label>
+                <textarea id="horario_clases" name="horario_clases" rows="3">{{ usuario.horario_clases }}</textarea>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%;">Guardar Cambios</button>
+        </form>
+        
+        <div style="margin-top: 1rem; text-align: center;">
+            <a href="{{ url_for('dashboard_usuario') }}" class="btn btn-secondary">Volver al Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

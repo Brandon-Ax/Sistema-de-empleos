@@ -1,0 +1,67 @@
+[
+  {
+    "id": "1",
+    "empleador_id": "1",
+    "titulo": "Mesero",
+    "descripcion": "Atender a los clientes con eficacia ",
+    "categoria": "Eventos",
+    "pago": "150.49",
+    "horario": "Lunes a Viernes de 10 am - 2 pm",
+    "ubicacion": "Jr. Caraz",
+    "requisitos": "Se necesita personal con experiencia",
+    "estado": "disponible",
+    "fecha_publicacion": "2025-10-29T09:25:47.544104"
+  },
+  {
+    "id": "2",
+    "empleador_id": "1",
+    "titulo": "Cocinero",
+    "descripcion": "Cocinar",
+    "categoria": "Gastronomía",
+    "pago": "250.49",
+    "horario": "Lunes a viernes de 9 am - 2 pm",
+    "ubicacion": "Jr. Caraz",
+    "requisitos": "",
+    "estado": "ocupado",
+    "fecha_publicacion": "2025-10-29T22:57:41.777331"
+  },
+  {
+    "id": "3",
+    "empleador_id": "2",
+    "titulo": "Cocinero",
+    "descripcion": "Saber cocinar",
+    "categoria": "Gastronomía",
+    "pago": "250.49",
+    "horario": "Lunes a viernes de 9 am - 2 pm",
+    "ubicacion": "Jr. Caraz",
+    "requisitos": "Cocinar",
+    "estado": "ocupado",
+    "fecha_publicacion": "2025-11-03T14:24:13.818029"
+  },
+  {
+    "id": "4",
+    "empleador_id": "2",
+    "titulo": "Lava platos",
+    "descripcion": "Lavar los platos",
+    "categoria": "Otros",
+    "pago": "50",
+    "horario": "Lunes a viernes de 9 am - 2 pm",
+    "ubicacion": "Jr. Caraz",
+    "requisitos": "saber lavar",
+    "estado": "disponible",
+    "fecha_publicacion": "2025-11-03T14:25:02.769140"
+  },
+  {
+    "id": "5",
+    "empleador_id": "3",
+    "titulo": "Mesero",
+    "descripcion": "Atender a los clientes",
+    "categoria": "Gastronomía",
+    "pago": "150",
+    "horario": "Lunes a viernes de 9 am - 2 pm",
+    "ubicacion": "Jr. Caraz",
+    "requisitos": "Saber atender",
+    "estado": "ocupado",
+    "fecha_publicacion": "2025-11-03T14:50:34.078836"
+  }
+]

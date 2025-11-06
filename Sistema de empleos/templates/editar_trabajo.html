@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Editar Trabajo</h2>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="titulo">Título del Trabajo:</label>
+                <input type="text" id="titulo" name="titulo" value="{{ trabajo.titulo }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="categoria">Categoría:</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="Gastronomía" {% if trabajo.categoria == 'Gastronomía' %}selected{% endif %}>Gastronomía</option>
+                    <option value="Tecnología" {% if trabajo.categoria == 'Tecnología' %}selected{% endif %}>Tecnología</option>
+                    <option value="Educación" {% if trabajo.categoria == 'Educación' %}selected{% endif %}>Educación</option>
+                    <option value="Cuidado de mascotas" {% if trabajo.categoria == 'Cuidado de mascotas' %}selected{% endif %}>Cuidado de mascotas</option>
+                    <option value="Eventos" {% if trabajo.categoria == 'Eventos' %}selected{% endif %}>Eventos</option>
+                    <option value="Otros" {% if trabajo.categoria == 'Otros' %}selected{% endif %}>Otros</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="descripcion">Descripción del Trabajo:</label>
+                <textarea id="descripcion" name="descripcion" rows="4" required>{{ trabajo.descripcion }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="requisitos">Requisitos:</label>
+                <textarea id="requisitos" name="requisitos" rows="3">{{ trabajo.requisitos }}</textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="pago">Pago (S/):</label>
+                    <input type="number" id="pago" name="pago" value="{{ trabajo.pago }}" min="0" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado">Estado:</label>
+                    <select id="estado" name="estado" required>
+                        <option value="disponible" {% if trabajo.estado == 'disponible' %}selected{% endif %}>Disponible</option>
+                        <option value="ocupado" {% if trabajo.estado == 'ocupado' %}selected{% endif %}>Ocupado</option>
+                        <option value="finalizado" {% if trabajo.estado == 'finalizado' %}selected{% endif %}>Finalizado</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="horario">Horario:</label>
+                <input type="text" id="horario" name="horario" value="{{ trabajo.horario }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="ubicacion">Ubicación:</label>
+                <input type="text" id="ubicacion" name="ubicacion" value="{{ trabajo.ubicacion }}" required>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%;">Guardar Cambios</button>
+        </form>
+        
+        <div style="margin-top: 1rem; text-align: center;">
+            <a href="{{ url_for('dashboard_empleador') }}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

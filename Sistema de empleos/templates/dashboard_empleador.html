@@ -1,0 +1,742 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>🏢 Dashboard - Empleador</h1>
+    <p>Bienvenido/a, <strong>{{ empleador.empresa }}</strong></p>
+    <p class="dashboard-subtitle">Representante: {{ empleador.nombre_representante }}</p>
+</div>
+
+<!-- Sección de Alertas No Leídas - ACTUALIZADA -->
+{% set alertas_no_leidas = [] %}
+{% for alerta in alertas %}
+    {% if alerta.destinatario in ['todos', 'empleadores'] %}
+        {% set leida = alerta.leida_por is defined and session.user_id in alerta.leida_por %}
+        {% if not leida %}
+            {% set _ = alertas_no_leidas.append(alerta) %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if alertas_no_leidas %}
+<div class="alertas-container">
+    <div class="alertas-header">
+        <h3>⚠️ Alertas Pendientes ({{ alertas_no_leidas|length }})</h3>
+        {% if alertas_no_leidas|length > 1 %}
+        <a href="{{ url_for('descartar_todas_alertas') }}" 
+           class="btn btn-secondary btn-sm"
+           onclick="return confirm('¿Marcar todas las alertas como leídas?')">
+            📪 Marcar Todas como Leídas
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="alertas-grid">
+        {% for alerta in alertas_no_leidas[:3] %}
+        <div class="alerta-card alerta-{{ alerta.tipo }}">
+            <div class="alerta-header">
+                <div class="alerta-titulo">
+                    <span class="alerta-icono">
+                        {% if alerta.tipo == 'urgente' %}🚨
+                        {% elif alerta.tipo == 'advertencia' %}⚠️
+                        {% else %}ℹ️{% endif %}
+                    </span>
+                    <h4>{{ alerta.titulo }}</h4>
+                </div>
+                <div class="alerta-acciones">
+                    <a href="{{ url_for('marcar_alerta_leida', alerta_id=alerta.id) }}" 
+                       class="btn-cerrar"
+                       title="Marcar como leída">
+                        ✕
+                    </a>
+                </div>
+            </div>
+            
+            <div class="alerta-contenido">
+                <p>{{ alerta.mensaje }}</p>
+            </div>
+            
+            <div class="alerta-footer">
+                <span class="alerta-badge badge-{{ alerta.tipo }}">
+                    {{ alerta.tipo|title }}
+                </span>
+                <span class="alerta-fecha">
+                    {{ alerta.fecha_envio[:10] }}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if alertas_no_leidas|length > 3 %}
+    <div class="alertas-footer">
+        <a href="{{ url_for('ver_alertas') }}" class="btn btn-outline">
+            Ver todas las alertas ({{ alertas_no_leidas|length - 3 }} más)
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Grid Principal de Información -->
+<div class="info-grid">
+    <!-- Información de la Empresa -->
+    <div class="card">
+        <div class="card-header">
+            <h3>🏢 Información de la Empresa</h3>
+        </div>
+        <div class="card-content">
+            <div class="info-item">
+                <span class="info-label">Empresa:</span>
+                <span class="info-value">{{ empleador.empresa }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Representante:</span>
+                <span class="info-value">{{ empleador.nombre_representante }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">📞 Teléfono:</span>
+                <span class="info-value">{{ empleador.telefono }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">📍 Dirección:</span>
+                <span class="info-value">{{ empleador.direccion }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">💼 Rubro:</span>
+                <span class="info-value">{{ empleador.rubro }}</span>
+            </div>
+            <a href="{{ url_for('editar_perfil_empleador') }}" class="btn btn-primary btn-block">
+                ✏️ Editar Información
+            </a>
+        </div>
+    </div>
+    
+    <!-- Acciones Rápidas -->
+    <div class="card">
+        <div class="card-header">
+            <h3>🚀 Acciones Rápidas</h3>
+        </div>
+        <div class="card-content acciones-grid">
+            <a href="{{ url_for('publicar_trabajo') }}" class="accion-btn btn-primary">
+                📝 Publicar Nuevo Trabajo
+            </a>
+            <a href="{{ url_for('empleador_trabajos_activos') }}" class="accion-btn btn-success">
+                👥 Gestionar Trabajos Activos
+            </a>
+            <a href="{{ url_for('ver_mensajes') }}" class="accion-btn btn-info">
+                📨 Mis Mensajes
+            </a>
+            <a href="{{ url_for('ver_alertas') }}" class="accion-btn btn-warning">
+                ⚠️ Ver Todas las Alertas
+            </a>
+            <a href="{{ url_for('mis_reportes') }}" class="accion-btn btn-secondary">
+                📋 Mis Reportes
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Trabajos Activos -->
+{% set trabajos_activos_lista = [] %}
+{% for trabajo in trabajos_activos %}
+    {% if trabajo.empleador_id == session.user_id and trabajo.estado == 'activo' %}
+        {% set _ = trabajos_activos_lista.append(trabajo) %}
+    {% endif %}
+{% endfor %}
+
+{% if trabajos_activos_lista %}
+<div class="card card-success">
+    <div class="card-header">
+        <h3>👥 Trabajos Activos ({{ trabajos_activos_lista|length }})</h3>
+    </div>
+    <div class="trabajos-activos">
+        {% for trabajo in trabajos_activos_lista %}
+        <div class="trabajo-activo">
+            <div class="trabajo-info">
+                <h4>{{ trabajo.titulo }}</h4>
+                <div class="trabajo-detalles">
+                    <div class="detalle-item">
+                        <span class="detalle-label">👤 Estudiante:</span>
+                        <span class="detalle-valor">
+                            {% set usuario_info = usuarios|selectattr('id', 'equalto', trabajo.usuario_id)|first %}
+                            {{ usuario_info.nombres }} {{ usuario_info.apellidos if usuario_info else 'N/A' }}
+                        </span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">🕒 Horario:</span>
+                        <span class="detalle-valor">{{ trabajo.horario_trabajo }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">💰 Pago:</span>
+                        <span class="detalle-valor">S/ {{ trabajo.pago }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="trabajo-acciones">
+                <a href="{{ url_for('calificar_usuario', trabajo_activo_id=trabajo.id) }}" 
+                   class="btn btn-warning">
+                    ⭐ Calificar Desempeño
+                </a>
+                <a href="{{ url_for('iniciar_chat', user_id=trabajo.usuario_id) }}" 
+                   class="btn btn-primary">
+                    📨 Mensajear
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Sección de Trabajos Publicados -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-header-title">
+            <h3>💼 Tus Trabajos Publicados</h3>
+            <span class="badge">{{ trabajos|length }} publicados</span>
+        </div>
+        <a href="{{ url_for('publicar_trabajo') }}" class="btn btn-primary">
+            ➕ Publicar Nuevo
+        </a>
+    </div>
+    
+    <div class="card-content">
+        {% if trabajos %}
+        <div class="trabajos-grid">
+            {% for trabajo in trabajos %}
+            <div class="trabajo-card">
+                <div class="trabajo-header">
+                    <h4>{{ trabajo.titulo }}</h4>
+                    <span class="trabajo-estado estado-{{ trabajo.estado }}">
+                        {{ trabajo.estado|title }}
+                    </span>
+                </div>
+                
+                <p class="trabajo-descripcion">
+                    {{ trabajo.descripcion[:100] }}{% if trabajo.descripcion|length > 100 %}...{% endif %}
+                </p>
+                
+                <div class="trabajo-meta">
+                    <span class="meta-item">💰 S/ {{ trabajo.pago }}</span>
+                    <span class="meta-item">📨 {{ trabajo.solicitudes|length }} solicitudes</span>
+                    <span class="meta-item">📍 {{ trabajo.ubicacion }}</span>
+                </div>
+                
+                <div class="trabajo-acciones">
+                    <a href="{{ url_for('ver_postulaciones', trabajo_id=trabajo.id) }}" 
+                       class="btn btn-primary btn-sm">
+                        👀 Ver Postulaciones
+                    </a>
+                    <a href="{{ url_for('editar_trabajo', trabajo_id=trabajo.id) }}" 
+                       class="btn btn-secondary btn-sm">
+                        ✏️ Editar
+                    </a>
+                    <a href="{{ url_for('eliminar_trabajo', trabajo_id=trabajo.id) }}" 
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Estás seguro de eliminar este trabajo?')">
+                        🗑️ Eliminar
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>📝 No has publicado ningún trabajo aún</p>
+            <a href="{{ url_for('publicar_trabajo') }}" class="btn btn-primary">
+                Publicar Primer Trabajo
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Sección de Estadísticas -->
+<div class="card">
+    <div class="card-header">
+        <h3>📊 Estadísticas de tu Empresa</h3>
+    </div>
+    <div class="card-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: #667eea;">
+                    📝
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ total_trabajos }}</span>
+                    <span class="stat-label">Trabajos Publicados</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: #28a745;">
+                    👥
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ trabajos_activos }}</span>
+                    <span class="stat-label">Trabajos Activos</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: #ffc107;">
+                    📨
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ total_solicitudes }}</span>
+                    <span class="stat-label">Solicitudes Recibidas</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: #17a2b8;">
+                    ✅
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ trabajos_completados }}</span>
+                    <span class="stat-label">Trabajos Completados</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para el dashboard del empleador */
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+    }
+    
+    .dashboard-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+    }
+    
+    .dashboard-subtitle {
+        opacity: 0.9;
+        margin: 0;
+    }
+    
+    /* Alertas (manteniendo los mismos estilos del dashboard usuario) */
+    .alertas-container {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border-left: 4px solid #ffc107;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 20px rgba(255, 193, 7, 0.2);
+    }
+    
+    .alertas-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alertas-header h3 {
+        margin: 0;
+        color: #856404;
+    }
+    
+    .alertas-grid {
+        display: grid;
+        gap: 1rem;
+    }
+    
+    .alerta-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        border-left: 4px solid;
+    }
+    
+    .alerta-urgente { border-left-color: #dc3545; }
+    .alerta-advertencia { border-left-color: #ffc107; }
+    .alerta-informativa { border-left-color: #17a2b8; }
+    
+    .alerta-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .alerta-titulo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .alerta-titulo h4 {
+        margin: 0;
+        color: #333;
+    }
+    
+    .alerta-icono { font-size: 1.2rem; }
+    
+    .btn-cerrar {
+        color: #999;
+        text-decoration: none;
+        font-size: 1.2rem;
+        padding: 0.25rem;
+        transition: color 0.3s;
+    }
+    
+    .btn-cerrar:hover { color: #dc3545; }
+    
+    .alerta-contenido p {
+        margin: 0;
+        color: #666;
+        line-height: 1.5;
+    }
+    
+    .alerta-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .alerta-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .badge-urgente { background-color: #dc3545; }
+    .badge-advertencia { background-color: #ffc107; color: #000; }
+    .badge-informativa { background-color: #17a2b8; }
+    
+    .alerta-fecha {
+        color: #999;
+        font-size: 0.8rem;
+    }
+    
+    .alertas-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    /* Grid de información */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+    }
+    
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #666;
+    }
+    
+    .info-value {
+        color: #333;
+        text-align: right;
+    }
+    
+    /* Acciones rápidas */
+    .acciones-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .accion-btn {
+        display: block;
+        padding: 1rem;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary { background: #667eea; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-info { background: #17a2b8; color: white; }
+    .btn-warning { background: #ffc107; color: #000; }
+    .btn-secondary { background: #6c757d; color: white; }
+    
+    .accion-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* Trabajos activos */
+    .trabajos-activos {
+        display: grid;
+        gap: 1.5rem;
+    }
+    
+    .trabajo-activo {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2rem;
+        align-items: start;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .trabajo-detalles {
+        display: grid;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .detalle-item {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .detalle-label {
+        font-weight: 600;
+        color: #666;
+    }
+    
+    .detalle-valor {
+        color: #333;
+    }
+    
+    .trabajo-acciones {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-width: 200px;
+    }
+    
+    /* Trabajos publicados */
+    .card-header-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .trabajos-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+    
+    .trabajo-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .trabajo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .trabajo-header h4 {
+        margin: 0;
+        color: #333;
+    }
+    
+    .trabajo-estado {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .estado-activo { background-color: #28a745; }
+    .estado-pendiente { background-color: #ffc107; color: #000; }
+    .estado-completado { background-color: #17a2b8; }
+    
+    .trabajo-meta {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+    }
+    
+    .meta-item {
+        background: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        color: #666;
+        border: 1px solid #dee2e6;
+    }
+    
+    .trabajo-acciones {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    /* Estadísticas */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .stat-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    /* Estados vacíos */
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+    }
+    
+    .empty-state p {
+        margin: 0 0 1rem 0;
+    }
+    
+    /* Botones mejorados */
+    .btn-block {
+        width: 100%;
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+    
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .trabajo-activo {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .alertas-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .trabajo-header {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+        
+        .trabajo-acciones {
+            flex-direction: column;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .stat-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .trabajo-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}

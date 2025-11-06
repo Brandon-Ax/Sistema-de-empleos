@@ -1,0 +1,33 @@
+[
+  {
+    "id": "1",
+    "titulo": "MANTENIMIENTO",
+    "mensaje": "Los servidores están en mantenimiento, esperamos su comprensión ",
+    "tipo": "info",
+    "prioridad": "alta",
+    "destinatario": "empleadores",
+    "fecha_expiracion": "",
+    "fecha_envio": "2025-10-29T21:34:07.499363",
+    "admin_id": "admin",
+    "estado": "activa",
+    "leida_por": [
+      "2"
+    ]
+  },
+  {
+    "id": "2",
+    "titulo": "Prueba",
+    "mensaje": "ALERTA ",
+    "tipo": "info",
+    "prioridad": "baja",
+    "destinatario": "todos",
+    "fecha_expiracion": "",
+    "fecha_envio": "2025-11-02T13:01:29.200833",
+    "admin_id": "admin",
+    "estado": "activa",
+    "leida_por": [
+      "3",
+      "2"
+    ]
+  }
+]

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <h1>Gestión de Reportes</h1>
+    
+    <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+        <a href="{{ url_for('dashboard_admin') }}" class="btn btn-secondary">← Dashboard Admin</a>
+    </div>
+
+    <!-- Estadísticas -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+        <div class="card" style="text-align: center;">
+            <h3>{{ reportes|length }}</h3>
+            <p>Total Reportes</p>
+        </div>
+        <div class="card" style="text-align: center; background-color: {% if reportes_pendientes > 0 %}#fff3cd{% else %}#f8f9fa{% endif %};">
+            <h3>{{ reportes_pendientes }}</h3>
+            <p>Pendientes</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3>{{ reportes|selectattr('estado', 'equalto', 'revisado')|list|length }}</h3>
+            <p>Revisados</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3>{{ reportes|selectattr('estado', 'equalto', 'resuelto')|list|length }}</h3>
+            <p>Resueltos</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Lista de Reportes</h3>
+        
+        {% if reportes %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #667eea; color: white;">
+                            <th style="padding: 1rem; text-align: left;">ID</th>
+                            <th style="padding: 1rem; text-align: left;">Reportador</th>
+                            <th style="padding: 1rem; text-align: left;">Reportado</th>
+                            <th style="padding: 1rem; text-align: left;">Título</th>
+                            <th style="padding: 1rem; text-align: left;">Categoría</th>
+                            <th style="padding: 1rem; text-align: left;">Prioridad</th>
+                            <th style="padding: 1rem; text-align: left;">Estado</th>
+                            <th style="padding: 1rem; text-align: left;">Fecha</th>
+                            <th style="padding: 1rem; text-align: left;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reporte in reportes|reverse %}
+                        <tr style="border-bottom: 1px solid #eee; {% if reporte.estado == 'pendiente' %}background-color: #fff3cd;{% endif %}">
+                            <td style="padding: 1rem;">{{ reporte.id }}</td>
+                            <td style="padding: 1rem;">
+                                {{ reporte.reportador_tipo|title }}<br>
+                                <small>ID: {{ reporte.reportador_id }}</small>
+                            </td>
+                            <td style="padding: 1rem;">
+                                {{ reporte.reportado_nombre }}<br>
+                                <small>{{ reporte.reportado_tipo|title }} - ID: {{ reporte.reportado_id }}</small>
+                            </td>
+                            <td style="padding: 1rem;">{{ reporte.titulo }}</td>
+                            <td style="padding: 1rem;">{{ reporte.categoria|replace('_', ' ')|title }}</td>
+                            <td style="padding: 1rem;">
+                                <span style="padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;
+                                    background-color: 
+                                    {% if reporte.prioridad == 'urgente' %}#dc3545
+                                    {% elif reporte.prioridad == 'alta' %}#fd7e14
+                                    {% elif reporte.prioridad == 'media' %}#ffc107
+                                    {% else %}#28a745{% endif %};
+                                    color: white;">
+                                    {{ reporte.prioridad|title }}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                                    background-color: 
+                                    {% if reporte.estado == 'pendiente' %}#ffc107
+                                    {% elif reporte.estado == 'revisado' %}#17a2b8
+                                    {% else %}#28a745{% endif %}; 
+                                    color: white;">
+                                    {{ reporte.estado|title }}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem;">{{ reporte.fecha_reporte[:10] }}</td>
+                            <td style="padding: 1rem;">
+                                <a href="{{ url_for('admin_responder_reporte', reporte_id=reporte.id) }}" 
+                                   class="btn" style="padding: 0.5rem 1rem;">
+                                    {% if reporte.estado == 'pendiente' %}
+                                    👁️ Revisar
+                                    {% else %}
+                                    ✏️ Editar
+                                    {% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <p style="font-size: 1.2rem; color: #666;">
+                    No hay reportes en el sistema.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

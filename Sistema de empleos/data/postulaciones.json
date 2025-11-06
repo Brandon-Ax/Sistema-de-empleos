@@ -1,0 +1,51 @@
+[
+  {
+    "id": "1",
+    "trabajo_id": "1",
+    "usuario_id": "1",
+    "empleador_id": "1",
+    "estado": "aceptado",
+    "fecha_postulacion": "2025-10-29T10:17:22.289761",
+    "mensaje": "",
+    "fecha_respuesta": "2025-10-29T10:17:41.097277"
+  },
+  {
+    "id": "2",
+    "trabajo_id": "2",
+    "usuario_id": "2",
+    "empleador_id": "1",
+    "estado": "aceptado",
+    "fecha_postulacion": "2025-10-29T22:59:21.386228",
+    "mensaje": "",
+    "fecha_respuesta": "2025-10-29T23:01:06.924496"
+  },
+  {
+    "id": "3",
+    "trabajo_id": "1",
+    "usuario_id": "3",
+    "empleador_id": "1",
+    "estado": "pendiente",
+    "fecha_postulacion": "2025-11-02T01:09:22.316227",
+    "mensaje": ""
+  },
+  {
+    "id": "4",
+    "trabajo_id": "3",
+    "usuario_id": "3",
+    "empleador_id": "2",
+    "estado": "aceptado",
+    "fecha_postulacion": "2025-11-03T14:25:41.788465",
+    "mensaje": "",
+    "fecha_respuesta": "2025-11-03T14:26:02.926304"
+  },
+  {
+    "id": "5",
+    "trabajo_id": "5",
+    "usuario_id": "3",
+    "empleador_id": "3",
+    "estado": "aceptado",
+    "fecha_postulacion": "2025-11-03T14:55:17.696237",
+    "mensaje": "",
+    "fecha_respuesta": "2025-11-03T14:55:37.336177"
+  }
+]

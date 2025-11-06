@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    <h1>Mis Postulaciones</h1>
+    
+    <div class="card">
+        <h3>Historial de Postulaciones ({{ postulaciones|length }})</h3>
+        
+        {% if postulaciones %}
+            <div style="display: grid; gap: 1.5rem;">
+                {% for postulacion in postulaciones %}
+                <div class="card" style="background-color: #f8f9fa; border-left: 4px solid 
+                    {% if postulacion.estado == 'aceptado' %}#28a745
+                    {% elif postulacion.estado == 'rechazado' %}#dc3545
+                    {% else %}#ffc107{% endif %};">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h4>{{ postulacion.trabajo_info.titulo }}</h4>
+                            <p><strong>Empresa:</strong> {{ postulacion.empleador_info.empresa }}</p>
+                            <p><strong>Descripción:</strong> {{ postulacion.trabajo_info.descripcion }}</p>
+                            <p><strong>Pago:</strong> S/ {{ postulacion.trabajo_info.pago }}</p>
+                            <p><strong>Horario:</strong> {{ postulacion.trabajo_info.horario }}</p>
+                            <p><strong>Ubicación:</strong> {{ postulacion.trabajo_info.ubicacion }}</p>
+                            
+                            {% if postulacion.mensaje %}
+                            <div style="margin-top: 1rem; padding: 1rem; background-color: #e9ecef; border-radius: 5px;">
+                                <strong>Mi mensaje:</strong>
+                                <p style="margin: 0.5rem 0 0 0;">{{ postulacion.mensaje }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div style="margin-left: 1rem; text-align: right;">
+                            <p><strong>Estado:</strong> 
+                                <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                                    background-color: 
+                                    {% if postulacion.estado == 'aceptado' %}#28a745
+                                    {% elif postulacion.estado == 'rechazado' %}#dc3545
+                                    {% else %}#ffc107{% endif %}; 
+                                    color: white;">
+                                    {{ postulacion.estado|title }}
+                                </span>
+                            </p>
+                            
+                            <!-- BOTÓN DE REPORTE - NUEVO -->
+                            <a href="{{ url_for('crear_reporte', tipo_usuario='empleador', user_id=postulacion.empleador_info.id) }}" 
+                               class="btn" style="background-color: #dc3545; padding: 0.5rem 1rem; margin-top: 0.5rem;">
+                                🚨 Reportar Empleador
+                            </a>
+                            
+                            <small style="color: #666; display: block; margin-top: 1rem;">
+                                Postulé: {{ postulacion.fecha_postulacion[:10] }}
+                            </small>
+                            
+                            {% if postulacion.estado == 'aceptado' %}
+                            <div style="margin-top: 1rem; padding: 1rem; background-color: #d4edda; border-radius: 5px;">
+                                <strong>¡Felicidades! Fuiste aceptado.</strong>
+                                <p style="margin: 0.5rem 0 0 0;">
+                                    Contacta a la empresa: {{ postulacion.empleador_info.telefono }}
+                                </p>
+                                <a href="{{ url_for('ver_mensajes') }}" class="btn" style="margin-top: 0.5rem;">
+                                    📨 Enviar Mensaje
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <p style="font-size: 1.2rem; color: #666;">
+                    No has aplicado a ningún trabajo aún.
+                </p>
+                <a href="{{ url_for('ver_trabajos') }}" class="btn">Buscar Trabajos</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('dashboard_usuario') }}" class="btn btn-secondary">Volver al Dashboard</a>
+    </div>
+</div>
+{% endblock %}

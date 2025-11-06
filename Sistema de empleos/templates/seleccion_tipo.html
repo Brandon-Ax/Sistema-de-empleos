@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section style="padding: 4rem 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center;">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h1 style="color: white; font-size: 2.5rem; margin-bottom: 1rem;">Elige tu Perfil</h1>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.2rem;">Selecciona cómo quieres usar UniTrabajo</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 900px; margin: 0 auto;">
+            <!-- Tarjeta Estudiante -->
+            <div style="
+                background: white;
+                padding: 3rem 2rem;
+                border-radius: 15px;
+                text-align: center;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+                cursor: pointer;
+            " 
+            onmouseover="this.style.transform='translateY(-10px)';"
+            onmouseout="this.style.transform='translateY(0)';"
+            onclick="window.location.href='{{ url_for('seleccion_estudiante') }}'">
+                <div style="font-size: 4rem; margin-bottom: 1.5rem;">🎓</div>
+                <h2 style="color: #333; margin-bottom: 1rem;">Soy Estudiante</h2>
+                <p style="color: #666; line-height: 1.6; margin-bottom: 2rem;">
+                    Busco trabajos flexibles que se adapten a mi horario de clases. 
+                    Quiero ganar experiencia y dinero mientras estudio.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="{{ url_for('registro_usuario') }}" 
+                       class="btn" 
+                       style="background: #667eea; color: white; padding: 0.8rem 1.5rem;">
+                        Crear Cuenta
+                    </a>
+                    <a href="{{ url_for('login_usuario') }}" 
+                       class="btn" 
+                       style="background: transparent; border: 2px solid #667eea; color: #667eea; padding: 0.8rem 1.5rem;">
+                        Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta Empleador -->
+            <div style="
+                background: white;
+                padding: 3rem 2rem;
+                border-radius: 15px;
+                text-align: center;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+                cursor: pointer;
+            " 
+            onmouseover="this.style.transform='translateY(-10px)';"
+            onmouseout="this.style.transform='translateY(0)';"
+            onclick="window.location.href='{{ url_for('seleccion_empleador') }}'">
+                <div style="font-size: 4rem; margin-bottom: 1.5rem;">💼</div>
+                <h2 style="color: #333; margin-bottom: 1rem;">Soy Empleador</h2>
+                <p style="color: #666; line-height: 1.6; margin-bottom: 2rem;">
+                    Busco talento universitario para mis proyectos. 
+                    Necesito personas confiables y con habilidades específicas.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="{{ url_for('registro_empleador') }}" 
+                       class="btn" 
+                       style="background: #667eea; color: white; padding: 0.8rem 1.5rem;">
+                        Crear Cuenta
+                    </a>
+                    <a href="{{ url_for('login_empleador') }}" 
+                       class="btn" 
+                       style="background: transparent; border: 2px solid #667eea; color: #667eea; padding: 0.8rem 1.5rem;">
+                        Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="{{ url_for('index') }}" 
+               style="color: white; text-decoration: none; font-size: 1.1rem;">
+                ← Volver al Inicio
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+    .btn {
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+</style>
+{% endblock %}

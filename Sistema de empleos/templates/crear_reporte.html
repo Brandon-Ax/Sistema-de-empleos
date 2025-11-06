@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Reportar Usuario</h2>
+        
+        <div class="card" style="background-color: #f8f9fa; margin-bottom: 2rem;">
+            <h4>Estás reportando a:</h4>
+            <p style="font-size: 1.2rem; font-weight: bold; color: #667eea;">
+                {{ usuario_reportado }}
+            </p>
+            <small style="color: #666;">
+                {% if tipo_usuario == 'usuario' %}
+                    Estudiante
+                {% else %}
+                    Empleador
+                {% endif %}
+            </small>
+        </div>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="titulo">Título del Reporte:</label>
+                <input type="text" id="titulo" name="titulo" placeholder="Breve descripción del problema" required>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Seleccionar categoría</option>
+                        <option value="conducta_inapropiada">Conducta Inapropiada</option>
+                        <option value="acoso">Acoso o Hostigamiento</option>
+                        <option value="estafa">Estafa o Fraude</option>
+                        <option value="informacion_falsa">Información Falsa</option>
+                        <option value="incumplimiento">Incumplimiento de Acuerdo</option>
+                        <option value="spam">Spam</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="prioridad">Prioridad:</label>
+                    <select id="prioridad" name="prioridad" required>
+                        <option value="baja">Baja</option>
+                        <option value="media">Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="urgente">Urgente</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="descripcion">Descripción Detallada:</label>
+                <textarea id="descripcion" name="descripcion" rows="6" 
+                         placeholder="Describe detalladamente la situación o problema. Incluye fechas, horarios y cualquier información relevante." required></textarea>
+            </div>
+            
+            <div style="background-color: #fff3cd; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                <h5 style="color: #856404; margin: 0 0 0.5rem 0;">⚠️ Importante</h5>
+                <p style="margin: 0; font-size: 0.9rem; color: #856404;">
+                    Los reportes falsos pueden resultar en la suspensión de tu cuenta. 
+                    Solo reporta comportamientos que violen los términos de servicio.
+                </p>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%;">Enviar Reporte</button>
+        </form>
+        
+        <div style="margin-top: 1rem; text-align: center;">
+            <a href="{% if session.user_type == 'usuario' %}{{ url_for('dashboard_usuario') }}{% else %}{{ url_for('dashboard_empleador') }}{% endif %}" 
+               class="btn btn-secondary">
+                Cancelar
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto;">
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Iniciar Sesión - Usuario</h2>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%;">Ingresar</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 1rem;">
+            ¿No tienes cuenta? <a href="{{ url_for('registro_usuario') }}">Regístrate aquí</a>
+        </p>
+        
+        <p style="text-align: center; margin-top: 1rem;">
+            <a href="{{ url_for('login_empleador') }}">Soy Empleador</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

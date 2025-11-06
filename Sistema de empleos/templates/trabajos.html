@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <h1>Trabajos Disponibles</h1>
+    
+    <!-- Filtros -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <h3>Filtrar por Categoría</h3>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="{{ url_for('ver_trabajos') }}" 
+               class="btn {% if not categoria_actual %}btn-secondary{% else %}btn{% endif %}">
+                Todas las Categorías
+            </a>
+            {% for categoria in categorias %}
+            <a href="{{ url_for('ver_trabajos', categoria=categoria) }}" 
+               class="btn {% if categoria_actual == categoria %}btn-secondary{% else %}btn{% endif %}">
+                {{ categoria }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Lista de trabajos -->
+    <div class="card">
+        <h3>Trabajos Disponibles ({{ trabajos|length }})</h3>
+        
+        {% if trabajos %}
+            <div style="display: grid; gap: 1.5rem;">
+                {% for trabajo in trabajos %}
+                <div class="card" style="background-color: #f8f9fa; border-left: 4px solid #667eea;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h4 style="margin-bottom: 0.5rem; color: #667eea;">{{ trabajo.titulo }}</h4>
+                            <p><strong>Categoría:</strong> {{ trabajo.categoria }}</p>
+                            <p><strong>Descripción:</strong> {{ trabajo.descripcion }}</p>
+                            <p><strong>Pago:</strong> S/ {{ trabajo.pago }}</p>
+                            <p><strong>Horario:</strong> {{ trabajo.horario }}</p>
+                            <p><strong>Ubicación:</strong> {{ trabajo.ubicacion }}</p>
+                            
+                            <!-- Información del empleador -->
+                            {% set empleador_info = empleadores|selectattr('id', 'equalto', trabajo.empleador_id)|first %}
+                            <p><strong>Empresa:</strong> {{ empleador_info.empresa if empleador_info else 'N/A' }}</p>
+                            
+                            {% if trabajo.requisitos %}
+                            <p><strong>Requisitos:</strong> {{ trabajo.requisitos }}</p>
+                            {% endif %}
+                        </div>
+                        <div style="margin-left: 1rem;">
+                            {% if session.user_type == 'usuario' %}
+                            <form method="POST" action="{{ url_for('aplicar_trabajo', trabajo_id=trabajo.id) }}">
+                                <button type="submit" class="btn" style="padding: 0.75rem 1.5rem;">
+                                    Aplicar
+                                </button>
+                            </form>
+                            
+                            <!-- BOTÓN DE REPORTE - NUEVO -->
+                            <a href="{{ url_for('crear_reporte', tipo_usuario='empleador', user_id=trabajo.empleador_id) }}" 
+                               class="btn" style="background-color: #dc3545; padding: 0.5rem 1rem; margin-top: 0.5rem; display: block;">
+                                🚨 Reportar Empleador
+                            </a>
+                            {% elif not session.user_type %}
+                            <a href="{{ url_for('login_usuario') }}" class="btn" style="padding: 0.75rem 1.5rem;">
+                                Inicia sesión para aplicar
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+                        Publicado: {{ trabajo.fecha_publicacion[:10] }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <p style="font-size: 1.2rem; color: #666; margin-bottom: 1rem;">
+                    {% if categoria_actual %}
+                        No hay trabajos disponibles en la categoría "{{ categoria_actual }}"
+                    {% else %}
+                        No hay trabajos disponibles en este momento
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('ver_trabajos') }}" class="btn">Ver todos los trabajos</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

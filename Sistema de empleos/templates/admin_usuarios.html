@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Administración - Usuarios</h1>
+
+<div class="card">
+    <h3>Lista de Usuarios Registrados ({{ usuarios|length }})</h3>
+    
+    {% if usuarios %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #667eea; color: white;">
+                        <th style="padding: 1rem; text-align: left;">ID</th>
+                        <th style="padding: 1rem; text-align: left;">Nombre</th>
+                        <th style="padding: 1rem; text-align: left;">Email</th>
+                        <th style="padding: 1rem; text-align: left;">Universidad</th>
+                        <th style="padding: 1rem; text-align: left;">Código</th>
+                        <th style="padding: 1rem; text-align: left;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 1rem;">{{ usuario.id }}</td>
+                        <td style="padding: 1rem;">{{ usuario.nombres }} {{ usuario.apellidos }}</td>
+                        <td style="padding: 1rem;">{{ usuario.email }}</td>
+                        <td style="padding: 1rem;">{{ usuario.universidad }}</td>
+                        <td style="padding: 1rem;">{{ usuario.codigo_estudiante }}</td>
+                        <td style="padding: 1rem;">
+                            <a href="{{ url_for('admin_ver_usuario', user_id=usuario.id) }}" 
+                               class="btn" style="padding: 0.5rem 1rem; margin-bottom: 0.5rem;">
+                                Ver Detalles
+                            </a>
+                            <a href="{{ url_for('admin_eliminar_usuario', user_id=usuario.id) }}" 
+                               class="btn" 
+                               style="background-color: #dc3545; padding: 0.5rem 1rem;"
+                               onclick="return confirm('¿Estás seguro de eliminar este usuario?')">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No hay usuarios registrados.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 1rem;">
+    <a href="{{ url_for('dashboard_admin') }}" class="btn btn-secondary">Volver al Dashboard</a>
+</div>
+{% endblock %}

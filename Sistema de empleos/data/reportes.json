@@ -1,0 +1,19 @@
+[
+  {
+    "id": "1",
+    "reportador_id": "3",
+    "reportador_tipo": "usuario",
+    "reportado_id": "1",
+    "reportado_tipo": "empleador",
+    "reportado_nombre": "Restaurante",
+    "titulo": "No cumple con el pago acordado",
+    "descripcion": "NO me paga ",
+    "categoria": "estafa",
+    "prioridad": "alta",
+    "estado": "pendiente",
+    "fecha_reporte": "2025-11-02T01:10:10.172866",
+    "respuesta_admin": "                    \r\n         Gacias por su reporte, estaremos en contacto para resolverlo\r\n",
+    "fecha_respuesta": "2025-11-02T01:10:46.823227",
+    "admin_id": "admin"
+  }
+]

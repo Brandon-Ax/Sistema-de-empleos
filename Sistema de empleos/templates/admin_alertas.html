@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    <h1>Alertas Enviadas</h1>
+    
+    <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+        <a href="{{ url_for('dashboard_admin') }}" class="btn btn-secondary">← Dashboard Admin</a>
+        <a href="{{ url_for('admin_enviar_alerta') }}" class="btn">➕ Nueva Alerta</a>
+    </div>
+
+    <div class="card">
+        <h3>Historial de Alertas ({{ alertas|length }})</h3>
+        
+        {% if alertas %}
+            <div style="display: grid; gap: 1.5rem;">
+                {% for alerta in alertas|reverse %}
+                <div class="card" style="background-color: #f8f9fa; border-left: 4px solid 
+                    {% if alerta.tipo == 'urgente' %}#dc3545
+                    {% elif alerta.tipo == 'advertencia' %}#ffc107
+                    {% else %}#17a2b8{% endif %};">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: 
+                                {% if alerta.tipo == 'urgente' %}#dc3545
+                                {% elif alerta.tipo == 'advertencia' %}#856404
+                                {% else %}#155724{% endif %};">
+                                {{ alerta.titulo }}
+                            </h4>
+                            <p style="margin: 0 0 1rem 0;">{{ alerta.mensaje }}</p>
+                            
+                            <div style="display: flex; gap: 2rem; font-size: 0.9rem; color: #666;">
+                                <span><strong>Tipo:</strong> 
+                                    <span style="padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;
+                                        background-color: 
+                                        {% if alerta.tipo == 'urgente' %}#dc3545
+                                        {% elif alerta.tipo == 'advertencia' %}#ffc107
+                                        {% else %}#17a2b8{% endif %};
+                                        color: white;">
+                                        {{ alerta.tipo|title }}
+                                    </span>
+                                </span>
+                                <span><strong>Destinatario:</strong> 
+                                    {% if alerta.destinatario == 'todos' %}Todos los usuarios
+                                    {% elif alerta.destinatario == 'usuarios' %}Solo estudiantes
+                                    {% else %}Solo empleadores
+                                    {% endif %}
+                                </span>
+                                <span><strong>Enviado:</strong> {{ alerta.fecha_envio[:16] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <p style="font-size: 1.2rem; color: #666;">
+                    No se han enviado alertas.
+                </p>
+                <a href="{{ url_for('admin_enviar_alerta') }}" class="btn">Enviar Primera Alerta</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

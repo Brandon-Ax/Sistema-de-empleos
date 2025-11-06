@@ -1,0 +1,588 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>🎓 Dashboard - Estudiante</h1>
+    <p>Bienvenido/a, <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong></p>
+</div>
+
+<!-- Sección de Alertas No Leídas - ACTUALIZADA -->
+{% set alertas_no_leidas = [] %}
+{% for alerta in alertas %}
+    {% if alerta.destinatario in ['todos', 'usuarios'] %}
+        {% set leida = alerta.leida_por is defined and session.user_id in alerta.leida_por %}
+        {% if not leida %}
+            {% set _ = alertas_no_leidas.append(alerta) %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if alertas_no_leidas %}
+<div class="alertas-container">
+    <div class="alertas-header">
+        <h3>⚠️ Alertas Pendientes ({{ alertas_no_leidas|length }})</h3>
+        {% if alertas_no_leidas|length > 1 %}
+        <a href="{{ url_for('descartar_todas_alertas') }}" 
+           class="btn btn-secondary btn-sm"
+           onclick="return confirm('¿Marcar todas las alertas como leídas?')">
+            📪 Marcar Todas como Leídas
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="alertas-grid">
+        {% for alerta in alertas_no_leidas[:3] %}
+        <div class="alerta-card alerta-{{ alerta.tipo }}">
+            <div class="alerta-header">
+                <div class="alerta-titulo">
+                    <span class="alerta-icono">
+                        {% if alerta.tipo == 'urgente' %}🚨
+                        {% elif alerta.tipo == 'advertencia' %}⚠️
+                        {% else %}ℹ️{% endif %}
+                    </span>
+                    <h4>{{ alerta.titulo }}</h4>
+                </div>
+                <div class="alerta-acciones">
+                    <a href="{{ url_for('marcar_alerta_leida', alerta_id=alerta.id) }}" 
+                       class="btn-cerrar"
+                       title="Marcar como leída">
+                        ✕
+                    </a>
+                </div>
+            </div>
+            
+            <div class="alerta-contenido">
+                <p>{{ alerta.mensaje }}</p>
+            </div>
+            
+            <div class="alerta-footer">
+                <span class="alerta-badge badge-{{ alerta.tipo }}">
+                    {{ alerta.tipo|title }}
+                </span>
+                <span class="alerta-fecha">
+                    {{ alerta.fecha_envio[:10] }}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if alertas_no_leidas|length > 3 %}
+    <div class="alertas-footer">
+        <a href="{{ url_for('ver_alertas') }}" class="btn btn-outline">
+            Ver todas las alertas ({{ alertas_no_leidas|length - 3 }} más)
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Sección de Trabajos Activos -->
+{% if trabajos_activos %}
+<div class="card card-success">
+    <div class="card-header">
+        <h3>🎯 Trabajo Activo Actual</h3>
+    </div>
+    <div class="trabajos-activos">
+        {% for trabajo in trabajos_activos %}
+        <div class="trabajo-activo">
+            <div class="trabajo-info">
+                <h4>{{ trabajo.titulo }}</h4>
+                <p class="trabajo-descripcion">{{ trabajo.descripcion }}</p>
+                
+                <div class="trabajo-detalles">
+                    <div class="detalle-item">
+                        <span class="detalle-label">💰 Pago:</span>
+                        <span class="detalle-valor">S/ {{ trabajo.pago }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">📍 Ubicación:</span>
+                        <span class="detalle-valor">{{ trabajo.ubicacion }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">🕒 Horario:</span>
+                        <span class="detalle-valor">{{ trabajo.horario_trabajo }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">📅 Iniciado:</span>
+                        <span class="detalle-valor">{{ trabajo.fecha_inicio[:10] }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="trabajo-estado">
+                <span class="estado-badge estado-activo">
+                    {{ trabajo.estado|title }}
+                </span>
+                <a href="{{ url_for('ver_mensajes') }}" class="btn btn-primary">
+                    📨 Contactar Empleador
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Tarjetas de Información Personal -->
+<div class="info-grid">
+    <div class="card">
+        <div class="card-header">
+            <h3>👤 Mi Perfil</h3>
+        </div>
+        <div class="card-content">
+            <div class="perfil-item">
+                <span class="perfil-label">🏫 Universidad:</span>
+                <span class="perfil-valor">{{ usuario.universidad }}</span>
+            </div>
+            <div class="perfil-item">
+                <span class="perfil-label">📚 Carrera:</span>
+                <span class="perfil-valor">{{ usuario.carrera }}</span>
+            </div>
+            <div class="perfil-item">
+                <span class="perfil-label">🎫 Código:</span>
+                <span class="perfil-valor">{{ usuario.codigo_estudiante }}</span>
+            </div>
+            <div class="perfil-item">
+                <span class="perfil-label">💪 Habilidades:</span>
+                <span class="perfil-valor">{{ usuario.habilidades or 'Sin habilidades registradas' }}</span>
+            </div>
+            <a href="{{ url_for('editar_perfil_usuario') }}" class="btn btn-primary btn-block">
+                ✏️ Editar Perfil
+            </a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h3>📅 Horario de Clases</h3>
+        </div>
+        <div class="card-content">
+            {% if usuario.horario_clases %}
+            <div class="horario-content">
+                <p>{{ usuario.horario_clases }}</p>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>📝 No has registrado tu horario de clases</p>
+            </div>
+            {% endif %}
+            <a href="{{ url_for('editar_perfil_usuario') }}" class="btn btn-secondary btn-block">
+                🕒 Actualizar Horario
+            </a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h3>⭐ Mi Reputación</h3>
+        </div>
+        <div class="card-content">
+            <div class="reputacion-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Calificación Promedio</span>
+                    <span class="stat-value">4.8 ★</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Trabajos Completados</span>
+                    <span class="stat-value">12</span>
+                </div>
+            </div>
+            <a href="{{ url_for('ver_mis_calificaciones') }}" class="btn btn-primary btn-block">
+                📊 Ver Calificaciones
+            </a>
+            <a href="{{ url_for('mis_reportes') }}" class="btn btn-secondary btn-block">
+                📋 Mis Reportes
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Trabajos Disponibles -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-header-title">
+            <h3>💼 Trabajos Disponibles</h3>
+            <span class="badge">{{ trabajos|length }} disponibles</span>
+        </div>
+        <a href="{{ url_for('ver_trabajos') }}" class="btn btn-primary">
+            🔍 Ver Todos
+        </a>
+    </div>
+    
+    <div class="card-content">
+        {% if trabajos %}
+        <div class="trabajos-grid">
+            {% for trabajo in trabajos[:3] %}
+            <div class="trabajo-card">
+                <div class="trabajo-header">
+                    <h4>{{ trabajo.titulo }}</h4>
+                    <span class="trabajo-pago">S/ {{ trabajo.pago }}</span>
+                </div>
+                
+                <p class="trabajo-descripcion">
+                    {{ trabajo.descripcion[:120] }}{% if trabajo.descripcion|length > 120 %}...{% endif %}
+                </p>
+                
+                <div class="trabajo-meta">
+                    <span class="meta-item">🕒 {{ trabajo.horario }}</span>
+                    <span class="meta-item">📍 {{ trabajo.ubicacion }}</span>
+                </div>
+                
+                <form method="POST" action="{{ url_for('aplicar_trabajo', trabajo_id=trabajo.id) }}" class="aplicar-form">
+                    <div class="form-group">
+                        <label for="mensaje_{{ trabajo.id }}">Mensaje (opcional):</label>
+                        <textarea id="mensaje_{{ trabajo.id }}" name="mensaje" rows="2" 
+                                 placeholder="¿Por qué eres adecuado para este trabajo?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block">
+                        🚀 Aplicar a este Trabajo
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if trabajos|length > 3 %}
+        <div class="text-center">
+            <a href="{{ url_for('ver_trabajos') }}" class="btn btn-outline">
+                Ver más trabajos ({{ trabajos|length - 3 }} más)
+            </a>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="empty-state">
+            <p>🔍 No hay trabajos disponibles en este momento</p>
+            <a href="{{ url_for('ver_trabajos') }}" class="btn btn-primary">
+                Explorar Trabajos
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para el dashboard */
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+    }
+    
+    .dashboard-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+    }
+    
+    /* Alertas */
+    .alertas-container {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border-left: 4px solid #ffc107;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 20px rgba(255, 193, 7, 0.2);
+    }
+    
+    .alertas-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alertas-header h3 {
+        margin: 0;
+        color: #856404;
+    }
+    
+    .alertas-grid {
+        display: grid;
+        gap: 1rem;
+    }
+    
+    .alerta-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        border-left: 4px solid;
+    }
+    
+    .alerta-urgente {
+        border-left-color: #dc3545;
+    }
+    
+    .alerta-advertencia {
+        border-left-color: #ffc107;
+    }
+    
+    .alerta-informativa {
+        border-left-color: #17a2b8;
+    }
+    
+    .alerta-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .alerta-titulo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .alerta-titulo h4 {
+        margin: 0;
+        color: #333;
+    }
+    
+    .alerta-icono {
+        font-size: 1.2rem;
+    }
+    
+    .btn-cerrar {
+        color: #999;
+        text-decoration: none;
+        font-size: 1.2rem;
+        padding: 0.25rem;
+        transition: color 0.3s;
+    }
+    
+    .btn-cerrar:hover {
+        color: #dc3545;
+    }
+    
+    .alerta-contenido p {
+        margin: 0;
+        color: #666;
+        line-height: 1.5;
+    }
+    
+    .alerta-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .alerta-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .badge-urgente { background-color: #dc3545; }
+    .badge-advertencia { background-color: #ffc107; color: #000; }
+    .badge-informativa { background-color: #17a2b8; }
+    
+    .alerta-fecha {
+        color: #999;
+        font-size: 0.8rem;
+    }
+    
+    .alertas-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    /* Grid de información */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+    }
+    
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .perfil-item, .detalle-item, .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .perfil-label, .detalle-label, .stat-label {
+        font-weight: 600;
+        color: #666;
+    }
+    
+    .perfil-valor, .detalle-valor, .stat-value {
+        color: #333;
+    }
+    
+    .btn-block {
+        width: 100%;
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+    
+    /* Trabajos activos */
+    .trabajos-activos {
+        display: grid;
+        gap: 1.5rem;
+    }
+    
+    .trabajo-activo {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2rem;
+        align-items: start;
+    }
+    
+    .estado-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .estado-activo {
+        background-color: #28a745;
+    }
+    
+    /* Trabajos disponibles */
+    .card-header-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .trabajos-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+    
+    .trabajo-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .trabajo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .trabajo-header h4 {
+        margin: 0;
+        color: #333;
+    }
+    
+    .trabajo-pago {
+        background: #28a745;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .trabajo-meta {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .meta-item {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .aplicar-form {
+        margin-top: 1rem;
+    }
+    
+    /* Estados vacíos */
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+    }
+    
+    .empty-state p {
+        margin: 0 0 1rem 0;
+    }
+    
+    /* Botones mejorados */
+    .btn-outline {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+    
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .trabajo-activo {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .alertas-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .trabajo-header {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+        
+        .trabajo-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}

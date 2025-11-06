@@ -1,0 +1,17 @@
+[
+  {
+    "id": "3",
+    "nombres": "Martin",
+    "apellidos": "Rodríguez ",
+    "email": "Marco@gmail.com",
+    "password": "scrypt:32768:8:1$owqoq76zWji840gH$278cb330e80dd9ed3f4def4e607b60cd2a082cd0276cb3695b0d5e002bd4909e612840e06eb2b3d8f2fb0c40d0b3470f7d9029bc86e8b405f4f08e7a54d87c20",
+    "codigo_estudiante": "221.0203.026",
+    "dni": "77777777",
+    "telefono": "999999989",
+    "universidad": "Universidad Cesar Vallejo",
+    "carrera": "Ingeniería Industrial ",
+    "horario_clases": "Lunes, miércoles y viernes 7 a 10 am\r\n",
+    "habilidades": "todo",
+    "fecha_registro": "2025-11-02T01:08:53.514553"
+  }
+]

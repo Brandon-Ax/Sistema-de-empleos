@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Dashboard - Administrador</h1>
+
+<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-top: 2rem;">
+    <div class="card" style="text-align: center;">
+        <h3>{{ usuarios|length }}</h3>
+        <p>Usuarios Registrados</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3>{{ empleadores|length }}</h3>
+        <p>Empleadores Registrados</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3>{{ trabajos|length }}</h3>
+        <p>Trabajos Publicados</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3>{{ reportes|length }}</h3>
+        <p>Reportes</p>
+    </div>
+    <!-- Tarjeta de Reportes Pendientes - AÑADIDA -->
+    <div class="card" style="text-align: center; {% if reportes_pendientes > 0 %}background-color: #fff3cd; border-left: 4px solid #ffc107;{% endif %}">
+        <h3>{{ reportes_pendientes }}</h3>
+        <p>Reportes Pendientes</p>
+        {% if reportes_pendientes > 0 %}
+        <a href="{{ url_for('admin_reportes') }}" class="btn" style="margin-top: 0.5rem;">Revisar</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Secciones de Gestión y Comunicación - AÑADIDAS -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+    <div class="card">
+        <h3>Gestión de Usuarios</h3>
+        <p>Administra estudiantes y empleadores registrados.</p>
+        <div style="display: grid; gap: 0.5rem; margin-top: 1rem;">
+            <a href="{{ url_for('admin_usuarios') }}" class="btn">Gestionar Estudiantes</a>
+            <a href="{{ url_for('admin_empleadores') }}" class="btn">Gestionar Empleadores</a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>Comunicación</h3>
+        <p>Envía alertas y mensajes a los usuarios.</p>
+        <div style="display: grid; gap: 0.5rem; margin-top: 1rem;">
+            <a href="{{ url_for('admin_enviar_alerta') }}" class="btn">Enviar Alerta</a>
+            <a href="{{ url_for('admin_ver_alertas') }}" class="btn btn-secondary">Ver Alertas Enviadas</a>
+        </div>
+    </div>
+</div>
+
+<!-- Actividad Reciente - AÑADIDA -->
+<div class="card" style="margin-top: 2rem;">
+    <h3>Actividad Reciente</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <h4>Últimos Usuarios Registrados</h4>
+            {% for usuario in usuarios[-3:] %}
+            <div style="border-bottom: 1px solid #eee; padding: 0.5rem 0;">
+                <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+                <br>{{ usuario.email }} - {{ usuario.universidad }}
+                <br><small>{{ usuario.fecha_registro[:10] }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        <div>
+            <h4>Últimos Empleadores</h4>
+            {% for empleador in empleadores[-3:] %}
+            <div style="border-bottom: 1px solid #eee; padding: 0.5rem 0;">
+                <strong>{{ empleador.empresa }}</strong>
+                <br>{{ empleador.rubro }} - {{ empleador.nombre_representante }}
+                <br><small>{{ empleador.fecha_registro[:10] }}</small>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Secciones existentes (modificadas para mostrar menos elementos) -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+    <div class="card">
+        <h3>Usuarios Recientes</h3>
+        {% for usuario in usuarios[-3:] %}
+        <div style="border-bottom: 1px solid #eee; padding: 0.5rem 0;">
+            <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+            <br>{{ usuario.email }} - {{ usuario.universidad }}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="card">
+        <h3>Empleadores Recientes</h3>
+        {% for empleador in empleadores[-3:] %}
+        <div style="border-bottom: 1px solid #eee; padding: 0.5rem 0;">
+            <strong>{{ empleador.empresa }}</strong>
+            <br>{{ empleador.rubro }} - {{ empleador.nombre_representante }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3>Reportes Recientes</h3>
+    {% if reportes %}
+        {% for reporte in reportes[-3:] %}
+        <div style="border-bottom: 1px solid #eee; padding: 1rem 0;">
+            <strong>{{ reporte.titulo }}</strong>
+            <p>{{ reporte.descripcion }}</p>
+            <small>Por: {{ reporte.autor }} - {{ reporte.fecha }}</small>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No hay reportes.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,528 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="calificacion-container">
+    <div class="card">
+        <div class="calificacion-header">
+            <h2>⭐ Calificar Desempeño</h2>
+            <p>Evalúa el trabajo realizado por el estudiante</p>
+        </div>
+        
+        <!-- Información del Trabajo y Usuario -->
+        <div class="card info-card">
+            <div class="info-header">
+                <h4>📋 Información del Trabajo</h4>
+            </div>
+            <div class="info-grid">
+                <div class="info-column">
+                    <div class="info-item">
+                        <span class="info-label">Trabajo:</span>
+                        <span class="info-value">{{ trabajo_activo.titulo }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Descripción:</span>
+                        <span class="info-value">{{ trabajo_activo.descripcion }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Pago:</span>
+                        <span class="info-value">S/ {{ trabajo_activo.pago }}</span>
+                    </div>
+                </div>
+                <div class="info-column">
+                    <div class="info-item">
+                        <span class="info-label">Estudiante:</span>
+                        <span class="info-value">{{ usuario.nombres }} {{ usuario.apellidos }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Horario:</span>
+                        <span class="info-value">{{ trabajo_activo.horario_trabajo }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ubicación:</span>
+                        <span class="info-value">{{ trabajo_activo.ubicacion }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Iniciado:</span>
+                        <span class="info-value">{{ trabajo_activo.fecha_inicio[:10] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <form method="POST" class="calificacion-form">
+            <!-- Sistema de Calificación por Estrellas -->
+            <div class="form-group">
+                <label class="form-label">Calificación (1-5 estrellas):</label>
+                <div class="stars-container">
+                    {% for i in range(1, 6) %}
+                    <div class="star-wrapper">
+                        <input type="radio" name="puntuacion" value="{{ i }}" id="star{{ i }}" required 
+                               class="star-input">
+                        <label for="star{{ i }}" class="star-label" data-value="{{ i }}">
+                            <span class="star-icon">★</span>
+                            <span class="star-number">{{ i }}</span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="stars-description">
+                    <small>1 (Muy Malo) - 2 (Malo) - 3 (Regular) - 4 (Bueno) - 5 (Excelente)</small>
+                </div>
+                <div class="rating-feedback" id="ratingFeedback">
+                    Selecciona una calificación
+                </div>
+            </div>
+            
+            <!-- Comentario -->
+            <div class="form-group">
+                <label for="comentario" class="form-label">
+                    📝 Comentario sobre el desempeño:
+                </label>
+                <textarea id="comentario" name="comentario" rows="5" 
+                         placeholder="Describe el rendimiento del estudiante en el trabajo, aspectos positivos, áreas de mejora, puntualidad, calidad del trabajo, etc."
+                         class="form-textarea" required></textarea>
+                <div class="char-counter">
+                    <span id="charCount">0</span> caracteres
+                </div>
+            </div>
+            
+            <!-- Alerta importante -->
+            <div class="alert-important">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                    <strong>Importante:</strong> Al enviar esta calificación, el trabajo se marcará como finalizado y no podrás modificarla posteriormente.
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success btn-large">
+                    ✅ Enviar Calificación
+                </button>
+                <a href="{{ url_for('empleador_trabajos_activos') }}" class="btn btn-outline">
+                    ↩️ Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .calificacion-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .calificacion-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .calificacion-header h2 {
+        margin: 0 0 0.5rem 0;
+        color: #333;
+        font-size: 2.2rem;
+    }
+
+    .calificacion-header p {
+        margin: 0;
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    /* Información del trabajo */
+    .info-card {
+        background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+        border-left: 4px solid #667eea;
+        margin-bottom: 2rem;
+    }
+
+    .info-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .info-header h4 {
+        margin: 0;
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .info-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #555;
+        font-size: 0.9rem;
+    }
+
+    .info-value {
+        color: #333;
+        font-size: 1rem;
+    }
+
+    /* Sistema de estrellas */
+    .stars-container {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .star-wrapper {
+        position: relative;
+    }
+
+    .star-input {
+        display: none;
+    }
+
+    .star-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .star-label:hover {
+        background-color: rgba(255, 193, 7, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .star-icon {
+        font-size: 3rem;
+        color: #ddd;
+        transition: all 0.3s ease;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .star-number {
+        font-size: 0.8rem;
+        color: #999;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .star-input:checked + .star-label .star-icon,
+    .star-label:hover .star-icon {
+        color: #ffc107;
+        transform: scale(1.1);
+    }
+
+    .star-input:checked + .star-label .star-number {
+        color: #ffc107;
+    }
+
+    /* Efecto en cadena para las estrellas */
+    .stars-container:hover .star-label:hover ~ .star-label .star-icon {
+        color: #ddd;
+    }
+
+    .stars-description {
+        text-align: center;
+        margin-bottom: 1rem;
+        color: #666;
+    }
+
+    .rating-feedback {
+        text-align: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        font-weight: 600;
+        color: #667eea;
+        transition: all 0.3s ease;
+    }
+
+    /* Formulario */
+    .calificacion-form {
+        margin-top: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1rem;
+    }
+
+    .form-textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-family: inherit;
+        resize: vertical;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-textarea::placeholder {
+        color: #999;
+    }
+
+    .char-counter {
+        text-align: right;
+        margin-top: 0.5rem;
+        color: #666;
+        font-size: 0.8rem;
+    }
+
+    /* Alerta importante */
+    .alert-important {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border: 1px solid #ffc107;
+        border-radius: 10px;
+        margin: 2rem 0;
+    }
+
+    .alert-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .alert-content {
+        flex: 1;
+        color: #856404;
+    }
+
+    .alert-content strong {
+        color: #856404;
+    }
+
+    /* Botones */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-large {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #218838 0%, #1e9e8a 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid #6c757d;
+        color: #6c757d;
+    }
+
+    .btn-outline:hover {
+        background: #6c757d;
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .stars-container {
+            gap: 0.25rem;
+        }
+
+        .star-icon {
+            font-size: 2.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .alert-important {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .calificacion-header h2 {
+            font-size: 1.8rem;
+        }
+
+        .star-icon {
+            font-size: 2rem;
+        }
+
+        .stars-container {
+            gap: 0.1rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const starInputs = document.querySelectorAll('.star-input');
+        const starLabels = document.querySelectorAll('.star-label');
+        const ratingFeedback = document.getElementById('ratingFeedback');
+        const comentarioTextarea = document.getElementById('comentario');
+        const charCount = document.getElementById('charCount');
+        
+        let selectedRating = 0;
+        
+        // Mensajes de feedback para cada calificación
+        const feedbackMessages = {
+            1: '❌ Calificación muy baja - El desempeño fue insatisfactorio',
+            2: '⚠️ Calificación baja - Hay varias áreas que mejorar',
+            3: '🟡 Calificación regular - Cumple con lo básico esperado',
+            4: '✅ Calificación buena - Buen desempeño en general',
+            5: '⭐ Calificación excelente - Desempeño excepcional'
+        };
+        
+        // Función para actualizar estrellas y feedback
+        function updateStars(rating) {
+            selectedRating = rating;
+            
+            // Actualizar colores de estrellas
+            starLabels.forEach((label, index) => {
+                const starValue = parseInt(label.getAttribute('data-value'));
+                const starIcon = label.querySelector('.star-icon');
+                
+                if (starValue <= rating) {
+                    starIcon.style.color = '#ffc107';
+                    starIcon.style.transform = 'scale(1.1)';
+                } else {
+                    starIcon.style.color = '#ddd';
+                    starIcon.style.transform = 'scale(1)';
+                }
+            });
+            
+            // Actualizar feedback
+            if (rating > 0) {
+                ratingFeedback.textContent = feedbackMessages[rating];
+                ratingFeedback.style.background = '#e8f5e8';
+                ratingFeedback.style.color = '#155724';
+            } else {
+                ratingFeedback.textContent = 'Selecciona una calificación';
+                ratingFeedback.style.background = '#f8f9fa';
+                ratingFeedback.style.color = '#667eea';
+            }
+        }
+        
+        // Event listeners para inputs de estrellas
+        starInputs.forEach((input, index) => {
+            input.addEventListener('change', function() {
+                const rating = parseInt(this.value);
+                updateStars(rating);
+            });
+        });
+        
+        // Efectos hover para estrellas
+        starLabels.forEach((label, index) => {
+            const starValue = parseInt(label.getAttribute('data-value'));
+            
+            label.addEventListener('mouseenter', function() {
+                if (!selectedRating) {
+                    updateStars(starValue);
+                }
+            });
+            
+            label.addEventListener('mouseleave', function() {
+                if (!selectedRating) {
+                    updateStars(0);
+                }
+            });
+        });
+        
+        // Contador de caracteres para el comentario
+        comentarioTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = length;
+            
+            // Cambiar color según la longitud
+            if (length < 10) {
+                charCount.style.color = '#dc3545';
+            } else if (length < 50) {
+                charCount.style.color = '#ffc107';
+            } else {
+                charCount.style.color = '#28a745';
+            }
+        });
+        
+        // Validación del formulario
+        document.querySelector('.calificacion-form').addEventListener('submit', function(e) {
+            if (selectedRating === 0) {
+                e.preventDefault();
+                ratingFeedback.textContent = '⚠️ Por favor, selecciona una calificación';
+                ratingFeedback.style.background = '#fff3cd';
+                ratingFeedback.style.color = '#856404';
+                
+                // Animación de shake
+                ratingFeedback.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    ratingFeedback.style.animation = '';
+                }, 500);
+            }
+        });
+    });
+
+    // Animación shake para errores
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

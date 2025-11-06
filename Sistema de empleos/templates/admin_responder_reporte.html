@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h1>Responder Reporte</h1>
+    
+    <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+        <a href="{{ url_for('admin_reportes') }}" class="btn btn-secondary">← Volver a Reportes</a>
+    </div>
+
+    <div class="card" style="margin-bottom: 2rem;">
+        <h3>Información del Reporte</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                <p><strong>ID:</strong> {{ reporte.id }}</p>
+                <p><strong>Título:</strong> {{ reporte.titulo }}</p>
+                <p><strong>Categoría:</strong> {{ reporte.categoria|replace('_', ' ')|title }}</p>
+                <p><strong>Prioridad:</strong> 
+                    <span style="padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;
+                        background-color: 
+                        {% if reporte.prioridad == 'urgente' %}#dc3545
+                        {% elif reporte.prioridad == 'alta' %}#fd7e14
+                        {% elif reporte.prioridad == 'media' %}#ffc107
+                        {% else %}#28a745{% endif %};
+                        color: white;">
+                        {{ reporte.prioridad|title }}
+                    </span>
+                </p>
+            </div>
+            <div>
+                <p><strong>Reportador:</strong> {{ reporte.reportador_tipo|title }} (ID: {{ reporte.reportador_id }})</p>
+                <p><strong>Reportado:</strong> {{ reporte.reportado_nombre }} ({{ reporte.reportado_tipo|title }})</p>
+                <p><strong>Estado Actual:</strong> 
+                    <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                        background-color: 
+                        {% if reporte.estado == 'pendiente' %}#ffc107
+                        {% elif reporte.estado == 'revisado' %}#17a2b8
+                        {% else %}#28a745{% endif %}; 
+                        color: white;">
+                        {{ reporte.estado|title }}
+                    </span>
+                </p>
+                <p><strong>Fecha:</strong> {{ reporte.fecha_reporte[:16] }}</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1rem;">
+            <p><strong>Descripción del Reporte:</strong></p>
+            <div style="background-color: #f8f9fa; padding: 1rem; border-radius: 5px;">
+                <p style="margin: 0;">{{ reporte.descripcion }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Responder al Reporte</h3>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="estado">Nuevo Estado:</label>
+                <select id="estado" name="estado" required>
+                    <option value="pendiente" {% if reporte.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                    <option value="revisado" {% if reporte.estado == 'revisado' %}selected{% endif %}>Revisado</option>
+                    <option value="resuelto" {% if reporte.estado == 'resuelto' %}selected{% endif %}>Resuelto</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="respuesta">Respuesta del Administrador:</label>
+                <textarea id="respuesta" name="respuesta" rows="6" 
+                         placeholder="Escribe tu respuesta al usuario que envió el reporte. Esta respuesta será visible para el reportador." required>
+                    {{ reporte.respuesta_admin or '' }}
+                </textarea>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%;">Guardar Respuesta</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

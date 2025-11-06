@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <h1>Detalles del Empleador</h1>
+    
+    <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+        <a href="{{ url_for('admin_empleadores') }}" class="btn btn-secondary">← Volver a Empleadores</a>
+        <a href="{{ url_for('dashboard_admin') }}" class="btn">Dashboard Admin</a>
+    </div>
+
+    <div class="card">
+        <h2>Información de la Empresa</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div>
+                <h4>Datos de la Empresa</h4>
+                <p><strong>Empresa:</strong> {{ empleador.empresa }}</p>
+                <p><strong>RUC:</strong> {{ empleador.ruc }}</p>
+                <p><strong>Rubro:</strong> {{ empleador.rubro }}</p>
+                <p><strong>Dirección:</strong> {{ empleador.direccion }}</p>
+                <p><strong>Teléfono:</strong> {{ empleador.telefono }}</p>
+            </div>
+            <div>
+                <h4>Representante Legal</h4>
+                <p><strong>Nombre:</strong> {{ empleador.nombre_representante }}</p>
+                <p><strong>DNI:</strong> {{ empleador.dni_representante }}</p>
+                <p><strong>Email:</strong> {{ empleador.email }}</p>
+                <p><strong>Fecha de registro:</strong> {{ empleador.fecha_registro[:10] }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+        <div class="card" style="text-align: center;">
+            <h3>{{ trabajos|length }}</h3>
+            <p>Trabajos Publicados</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3>{{ total_postulaciones }}</h3>
+            <p>Total Postulaciones</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3>{{ postulaciones_aceptadas }}</h3>
+            <p>Postulaciones Aceptadas</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3>
+                {% if total_postulaciones > 0 %}
+                    {{ (postulaciones_aceptadas / total_postulaciones * 100)|round(1) }}%
+                {% else %}
+                    0%
+                {% endif %}
+            </h3>
+            <p>Tasa de Aceptación</p>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 2rem;">
+        <h3>Trabajos Publicados ({{ trabajos|length }})</h3>
+        
+        {% if trabajos %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #667eea; color: white;">
+                            <th style="padding: 1rem; text-align: left;">Título</th>
+                            <th style="padding: 1rem; text-align: left;">Categoría</th>
+                            <th style="padding: 1rem; text-align: left;">Pago (S/)</th>
+                            <th style="padding: 1rem; text-align: left;">Estado</th>
+                            <th style="padding: 1rem; text-align: left;">Fecha</th>
+                            <th style="padding: 1rem; text-align: left;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trabajo in trabajos %}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 1rem;">{{ trabajo.titulo }}</td>
+                            <td style="padding: 1rem;">{{ trabajo.categoria }}</td>
+                            <td style="padding: 1rem;">{{ trabajo.pago }}</td>
+                            <td style="padding: 1rem;">
+                                <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                                    background-color: 
+                                    {% if trabajo.estado == 'disponible' %}#28a745
+                                    {% elif trabajo.estado == 'ocupado' %}#ffc107
+                                    {% else %}#6c757d{% endif %}; 
+                                    color: white;">
+                                    {{ trabajo.estado|title }}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem;">{{ trabajo.fecha_publicacion[:10] }}</td>
+                            <td style="padding: 1rem;">
+                                <a href="{{ url_for('ver_postulaciones', trabajo_id=trabajo.id) }}" 
+                                   class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                    Ver Postulaciones
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem;">
+                <p style="color: #666;">El empleador no ha publicado ningún trabajo.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="card" style="margin-top: 2rem;">
+        <h3>Postulaciones Recientes</h3>
+        
+        {% set postulaciones_empleador = [] %}
+        {% for postulacion in postulaciones %}
+            {% if postulacion.empleador_id == empleador.id %}
+                {% for usuario in usuarios %}
+                    {% if usuario.id == postulacion.usuario_id %}
+                        {% set _ = postulaciones_empleador.append({
+                            'trabajo_id': postulacion.trabajo_id,
+                            'usuario_nombre': usuario.nombres ~ ' ' ~ usuario.apellidos,
+                            'estado': postulacion.estado,
+                            'fecha': postulacion.fecha_postulacion
+                        }) %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if postulaciones_empleador %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #667eea; color: white;">
+                            <th style="padding: 1rem; text-align: left;">Estudiante</th>
+                            <th style="padding: 1rem; text-align: left;">Estado</th>
+                            <th style="padding: 1rem; text-align: left;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in postulaciones_empleador %}
+                            {% if loop.index <= 5 %}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 1rem;">{{ post.usuario_nombre }}</td>
+                                <td style="padding: 1rem;">
+                                    <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                                        background-color: 
+                                        {% if post.estado == 'aceptado' %}#28a745
+                                        {% elif post.estado == 'rechazado' %}#dc3545
+                                        {% else %}#ffc107{% endif %}; 
+                                        color: white;">
+                                        {{ post.estado|title }}
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem;">{{ post.fecha[:10] }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem;">
+                <p style="color: #666;">No hay postulaciones para los trabajos de este empleador.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <a href="{{ url_for('admin_eliminar_empleador', emp_id=empleador.id) }}" 
+           class="btn" 
+           style="background-color: #dc3545;"
+           onclick="return confirm('¿Estás seguro de eliminar este empleador? Esta acción eliminará también todos sus trabajos y postulaciones.')">
+            🗑️ Eliminar Empleador
+        </a>
+    </div>
+</div>
+{% endblock %}

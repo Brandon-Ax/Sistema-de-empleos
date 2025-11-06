@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestión de Empleadores</h1>
+        <span class="badge bg-primary">{{ empleadores|length }} empleadores registrados</span>
+    </div>
+
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+        <a href="{{ url_for('dashboard_admin') }}" class="btn btn-secondary">← Dashboard Admin</a>
+        <a href="{{ url_for('admin_usuarios') }}" class="btn">Ver Usuarios</a>
+    </div>
+
+    {% if empleadores %}
+    <div class="card">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #667eea; color: white;">
+                        <th style="padding: 1rem; text-align: left;">Empresa</th>
+                        <th style="padding: 1rem; text-align: left;">RUC</th>
+                        <th style="padding: 1rem; text-align: left;">Representante</th>
+                        <th style="padding: 1rem; text-align: left;">Email</th>
+                        <th style="padding: 1rem; text-align: left;">Teléfono</th>
+                        <th style="padding: 1rem; text-align: left;">Fecha Registro</th>
+                        <th style="padding: 1rem; text-align: center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for empleador in empleadores %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 1rem;">
+                            <strong>{{ empleador.empresa }}</strong>
+                            <br><small class="text-muted">{{ empleador.rubro }}</small>
+                        </td>
+                        <td style="padding: 1rem;">{{ empleador.ruc }}</td>
+                        <td style="padding: 1rem;">{{ empleador.nombre_representante }}</td>
+                        <td style="padding: 1rem;">{{ empleador.email }}</td>
+                        <td style="padding: 1rem;">{{ empleador.telefono }}</td>
+                        <td style="padding: 1rem;">{{ empleador.fecha_registro[:10] }}</td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                                <a href="{{ url_for('admin_ver_empleador', emp_id=empleador.id) }}" 
+                                   class="btn btn-sm" 
+                                   style="background-color: #667eea; color: white;">
+                                    👁️ Ver
+                                </a>
+                                <a href="{{ url_for('admin_eliminar_empleador', emp_id=empleador.id) }}" 
+                                   class="btn btn-sm" 
+                                   style="background-color: #dc3545; color: white;"
+                                   onclick="return confirm('¿Estás seguro de eliminar a {{ empleador.empresa }}?')">
+                                    🗑️ Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <h3 style="color: #666;">No hay empleadores registrados</h3>
+        <p style="color: #888;">Aún no se han registrado empleadores en el sistema.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

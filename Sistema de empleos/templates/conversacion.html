@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; height: 80vh; display: flex; flex-direction: column;">
+    <div class="card" style="margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: between; align-items: center;">
+            <h3 style="margin: 0;">Conversación con: {{ nombre_otro }}</h3>
+            <a href="{{ url_for('ver_mensajes') }}" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+
+    <div class="card" style="flex: 1; display: flex; flex-direction: column;">
+        <!-- Área de mensajes -->
+        <div style="flex: 1; overflow-y: auto; padding: 1rem; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 1rem;">
+            {% if mensajes %}
+                {% for mensaje in mensajes %}
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; {% if mensaje.de_user_id == session.user_id %}justify-content: flex-end{% else %}justify-content: flex-start{% endif %};">
+                        <div style="max-width: 70%; padding: 0.75rem 1rem; border-radius: 15px; 
+                            {% if mensaje.de_user_id == session.user_id %}
+                                background-color: #667eea; color: white; border-bottom-right-radius: 5px;
+                            {% else %}
+                                background-color: white; border: 1px solid #ddd; border-bottom-left-radius: 5px;
+                            {% endif %}">
+                            <p style="margin: 0;">{{ mensaje.mensaje }}</p>
+                            <small style="opacity: 0.7; font-size: 0.8rem;">
+                                {{ mensaje.fecha[11:16] }}
+                                {% if mensaje.de_user_id == session.user_id and mensaje.leido %}
+                                    ✓✓
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: #666;">
+                    <p>No hay mensajes en esta conversación.</p>
+                    <p>¡Envía el primer mensaje!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Formulario para enviar mensaje -->
+        <form method="POST" style="display: flex; gap: 0.5rem;">
+            <input type="text" name="mensaje" placeholder="Escribe tu mensaje..." 
+                   style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 25px;" 
+                   required>
+            <button type="submit" class="btn" style="border-radius: 25px; padding: 0.75rem 1.5rem;">
+                Enviar
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .mensaje-propio {
+        background-color: #667eea;
+        color: white;
+        margin-left: auto;
+    }
+    
+    .mensaje-otro {
+        background-color: white;
+        border: 1px solid #ddd;
+    }
+</style>
+{% endblock %}

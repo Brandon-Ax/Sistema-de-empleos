@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h1>Mensajes</h1>
+    
+    <div class="card">
+        <h3>Mis Conversaciones</h3>
+        
+        {% if conversaciones %}
+            <div style="display: grid; gap: 1rem;">
+                {% for conversacion in conversaciones %}
+                <a href="{{ url_for('ver_conversacion', otro_user_id=conversacion.user_id) }}" 
+                   style="text-decoration: none; color: inherit;">
+                    <div class="card" style="background-color: #f8f9fa; cursor: pointer; transition: background-color 0.3s;"
+                         onmouseover="this.style.backgroundColor='#e9ecef'" 
+                         onmouseout="this.style.backgroundColor='#f8f9fa'">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin: 0; color: #667eea;">{{ conversacion.nombre }}</h4>
+                                <p style="margin: 0.5rem 0 0 0; color: #666;">
+                                    {{ conversacion.ultimo_mensaje[:50] }}{% if conversacion.ultimo_mensaje|length > 50 %}...{% endif %}
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <small style="color: #666;">{{ conversacion.fecha_ultimo[:10] }}</small>
+                                {% if conversacion.sin_leer > 0 %}
+                                <span style="background-color: #dc3545; color: white; border-radius: 50%; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                    {{ conversacion.sin_leer }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <p style="font-size: 1.2rem; color: #666;">
+                    No tienes conversaciones activas.
+                </p>
+                <p>Los mensajes aparecerán aquí cuando tengas postulaciones aceptadas.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% if session.user_type == 'usuario' %}{{ url_for('dashboard_usuario') }}{% else %}{{ url_for('dashboard_empleador') }}{% endif %}" 
+           class="btn btn-secondary">
+            Volver al Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Registro - Usuario Universitario</h2>
+        
+        <form method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="nombres">Nombres:</label>
+                    <input type="text" id="nombres" name="nombres" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellidos">Apellidos:</label>
+                    <input type="text" id="apellidos" name="apellidos" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="codigo_estudiante">Código Estudiante:</label>
+                    <input type="text" id="codigo_estudiante" name="codigo_estudiante" 
+                           placeholder="231.0408.026" required>
+                    <small>Formato: 231.0408.026</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dni">DNI:</label>
+                    <input type="text" id="dni" name="dni" maxlength="8" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono" name="telefono" maxlength="9" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="universidad">Universidad:</label>
+                <input type="text" id="universidad" name="universidad" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="carrera">Carrera:</label>
+                <input type="text" id="carrera" name="carrera" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="habilidades">Habilidades:</label>
+                <textarea id="habilidades" name="habilidades" rows="3" 
+                         placeholder="Ej: Mesero, Tutoría, Paseo de perros..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="horario_clases">Horario de Clases:</label>
+                <textarea id="horario_clases" name="horario_clases" rows="3" 
+                         placeholder="Ej: Lunes y Miércoles 8:00-12:00, Martes y Jueves 14:00-18:00"></textarea>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%;">Registrarse</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 1rem;">
+            ¿Ya tienes cuenta? <a href="{{ url_for('login_usuario') }}">Inicia sesión aquí</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

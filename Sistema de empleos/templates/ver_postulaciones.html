@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    <h1>Postulaciones para: {{ trabajo.titulo }}</h1>
+    
+    <div class="card" style="margin-bottom: 2rem;">
+        <h3>Información del Trabajo</h3>
+        <p><strong>Descripción:</strong> {{ trabajo.descripcion }}</p>
+        <p><strong>Pago:</strong> S/ {{ trabajo.pago }}</p>
+        <p><strong>Horario:</strong> {{ trabajo.horario }}</p>
+        <p><strong>Ubicación:</strong> {{ trabajo.ubicacion }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Postulaciones ({{ postulaciones|length }})</h3>
+        
+        {% if postulaciones %}
+            <div style="display: grid; gap: 1.5rem;">
+                {% for postulacion in postulaciones %}
+                <div class="card" style="background-color: #f8f9fa; border-left: 4px solid 
+                    {% if postulacion.estado == 'aceptado' %}#28a745
+                    {% elif postulacion.estado == 'rechazado' %}#dc3545
+                    {% else %}#ffc107{% endif %};">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h4>{{ postulacion.usuario_info.nombres }} {{ postulacion.usuario_info.apellidos }}</h4>
+                            <p><strong>Email:</strong> {{ postulacion.usuario_info.email }}</p>
+                            <p><strong>Teléfono:</strong> {{ postulacion.usuario_info.telefono }}</p>
+                            <p><strong>Universidad:</strong> {{ postulacion.usuario_info.universidad }}</p>
+                            <p><strong>Carrera:</strong> {{ postulacion.usuario_info.carrera }}</p>
+                            <p><strong>Habilidades:</strong> {{ postulacion.usuario_info.habilidades }}</p>
+                            <p><strong>Horario de Clases:</strong> {{ postulacion.usuario_info.horario_clases }}</p>
+                            
+                            {% if postulacion.mensaje %}
+                            <div style="margin-top: 1rem; padding: 1rem; background-color: #e9ecef; border-radius: 5px;">
+                                <strong>Mensaje del postulante:</strong>
+                                <p style="margin: 0.5rem 0 0 0;">{{ postulacion.mensaje }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-left: 1rem;">
+                            <p><strong>Estado:</strong> 
+                                <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                                    background-color: 
+                                    {% if postulacion.estado == 'aceptado' %}#28a745
+                                    {% elif postulacion.estado == 'rechazado' %}#dc3545
+                                    {% else %}#ffc107{% endif %}; 
+                                    color: white;">
+                                    {{ postulacion.estado|title }}
+                                </span>
+                            </p>
+                            
+                            {% if postulacion.estado == 'pendiente' %}
+                            <a href="{{ url_for('gestionar_postulacion', postulacion_id=postulacion.id, accion='aceptar') }}" 
+                               class="btn" style="background-color: #28a745;">
+                                Aceptar
+                            </a>
+                            <a href="{{ url_for('gestionar_postulacion', postulacion_id=postulacion.id, accion='rechazar') }}" 
+                               class="btn" style="background-color: #dc3545;">
+                                Rechazar
+                            </a>
+                            {% endif %}
+                            
+                            <!-- BOTÓN DE REPORTE - NUEVO -->
+                            <a href="{{ url_for('crear_reporte', tipo_usuario='usuario', user_id=postulacion.usuario_id) }}" 
+                               class="btn" style="background-color: #ffc107; padding: 0.5rem 1rem;">
+                                🚨 Reportar Usuario
+                            </a>
+                            
+                            <small style="color: #666;">
+                                Postuló: {{ postulacion.fecha_postulacion[:10] }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <p style="font-size: 1.2rem; color: #666;">
+                    No hay postulaciones para este trabajo aún.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('dashboard_empleador') }}" class="btn btn-secondary">Volver al Dashboard</a>
+    </div>
+</div>
+{% endblock %}

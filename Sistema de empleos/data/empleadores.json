@@ -1,0 +1,15 @@
+[
+  {
+    "id": "3",
+    "empresa": "Restaurante aji seco",
+    "ruc": "20111111111",
+    "dni_representante": "77777777",
+    "nombre_representante": "Roger",
+    "email": "Roger.restaurante@gmail.com",
+    "password": "scrypt:32768:8:1$XrvPihhSkSAkDdKe$7f36a6fe8d25827ffe62800c4f9987fc8fc11900b6b23179886479f76a5191e70d0622cdced96eb7b24d2581bce73c8b936027ebe52c63d1bb12f17addf28007",
+    "telefono": "989898989",
+    "direccion": "Jr. Puno",
+    "rubro": "Restaurante aji seco",
+    "fecha_registro": "2025-11-03T14:48:55.882858"
+  }
+]

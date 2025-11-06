@@ -1,0 +1,564 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="alertas-page">
+    <!-- Header de la página -->
+    <div class="page-header">
+        <h1>📢 Alertas y Avisos</h1>
+        <p>Mantente informado sobre las notificaciones importantes del sistema</p>
+    </div>
+
+    <!-- Estadísticas y controles -->
+    <div class="alertas-controls">
+        <div class="alertas-stats">
+            <div class="stat-item">
+                <span class="stat-number">{{ alertas|length }}</span>
+                <span class="stat-label">Total Alertas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ alertas_no_leidas }}</span>
+                <span class="stat-label">No Leídas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ alertas|selectattr('tipo', 'equalto', 'urgente')|list|length }}</span>
+                <span class="stat-label">Urgentes</span>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        {% if alertas_no_leidas > 0 %}
+        <div class="alertas-actions">
+            <a href="{{ url_for('descartar_todas_alertas') }}" 
+               class="btn btn-secondary"
+               onclick="return confirm('¿Marcar todas las alertas como leídas?')">
+                📪 Marcar Todas como Leídas
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-alertas">
+        <div class="filtro-group">
+            <label for="filtro-tipo">Filtrar por tipo:</label>
+            <select id="filtro-tipo" class="filtro-select">
+                <option value="todos">Todos los tipos</option>
+                <option value="urgente">🚨 Urgentes</option>
+                <option value="advertencia">⚠️ Advertencias</option>
+                <option value="informativa">ℹ️ Informativas</option>
+            </select>
+        </div>
+        <div class="filtro-group">
+            <label for="filtro-estado">Filtrar por estado:</label>
+            <select id="filtro-estado" class="filtro-select">
+                <option value="todos">Todas</option>
+                <option value="no-leidas">No leídas</option>
+                <option value="leidas">Leídas</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Lista de alertas -->
+    <div class="alertas-container">
+        {% if alertas %}
+            <div class="alertas-list">
+                {% for alerta in alertas|reverse %}
+                {% set leida = alerta.leida_por is defined and session.user_id in alerta.leida_por %}
+                <div class="alerta-item {% if leida %}alerta-leida{% else %}alerta-no-leida{% endif %} alerta-{{ alerta.tipo }}" 
+                     data-tipo="{{ alerta.tipo }}" 
+                     data-estado="{% if leida %}leida{% else %}no-leida{% endif %}">
+                    
+                    <!-- Header de la alerta -->
+                    <div class="alerta-header">
+                        <div class="alerta-titulo">
+                            <span class="alerta-icono">
+                                {% if alerta.tipo == 'urgente' %}🚨
+                                {% elif alerta.tipo == 'advertencia' %}⚠️
+                                {% else %}ℹ️{% endif %}
+                            </span>
+                            <h3>{{ alerta.titulo }}</h3>
+                        </div>
+                        <div class="alerta-acciones">
+                            {% if not leida %}
+                            <a href="{{ url_for('marcar_alerta_leida', alerta_id=alerta.id) }}" 
+                               class="btn btn-success btn-sm"
+                               title="Marcar como leída">
+                                ✅ Marcar como Leída
+                            </a>
+                            {% else %}
+                            <span class="estado-leida">✅ Leída</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Contenido de la alerta -->
+                    <div class="alerta-contenido">
+                        <p>{{ alerta.mensaje }}</p>
+                    </div>
+
+                    <!-- Metadata de la alerta -->
+                    <div class="alerta-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Tipo:</span>
+                            <span class="badge badge-{{ alerta.tipo }}">
+                                {{ alerta.tipo|title }}
+                            </span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Prioridad:</span>
+                            <span class="badge badge-prioridad-{{ alerta.prioridad }}">
+                                {{ alerta.prioridad|title }}
+                            </span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Destinatario:</span>
+                            <span class="badge badge-destinatario">
+                                {% if alerta.destinatario == 'todos' %}👥 Todos
+                                {% elif alerta.destinatario == 'usuarios' %}🎓 Estudiantes
+                                {% else %}🏢 Empleadores{% endif %}
+                            </span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Enviado:</span>
+                            <span class="meta-fecha">{{ alerta.fecha_envio[:16] }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Indicador de estado -->
+                    <div class="alerta-estado">
+                        {% if not leida %}
+                        <div class="nuevo-indicador">NUEVO</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Estado vacío -->
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>No hay alertas</h3>
+                <p>No hay alertas para mostrar en este momento.</p>
+                <p>Las alertas importantes aparecerán aquí cuando el administrador las envíe.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Navegación -->
+    <div class="alertas-navigation">
+        <a href="{% if session.user_type == 'usuario' %}{{ url_for('dashboard_usuario') }}{% else %}{{ url_for('dashboard_empleador') }}{% endif %}" 
+           class="btn btn-outline">
+            ← Volver al Dashboard
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para la página de alertas */
+    .alertas-page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+    }
+
+    .page-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+    }
+
+    .page-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    /* Controles y estadísticas */
+    .alertas-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .alertas-stats {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    /* Filtros */
+    .filtros-alertas {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .filtro-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filtro-group label {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .filtro-select {
+        padding: 0.5rem;
+        border: 2px solid #e1e5e9;
+        border-radius: 5px;
+        background: white;
+        font-size: 0.9rem;
+    }
+
+    /* Lista de alertas */
+    .alertas-container {
+        margin-bottom: 2rem;
+    }
+
+    .alertas-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .alerta-item {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        border-left: 5px solid;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .alerta-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .alerta-leida {
+        opacity: 0.8;
+        background: #f8f9fa;
+    }
+
+    .alerta-no-leida {
+        border-left-width: 6px;
+    }
+
+    /* Colores por tipo de alerta */
+    .alerta-urgente {
+        border-left-color: #dc3545;
+        background: linear-gradient(135deg, #fff5f5 0%, white 100%);
+    }
+
+    .alerta-advertencia {
+        border-left-color: #ffc107;
+        background: linear-gradient(135deg, #fffbf0 0%, white 100%);
+    }
+
+    .alerta-informativa {
+        border-left-color: #17a2b8;
+        background: linear-gradient(135deg, #f0f9ff 0%, white 100%);
+    }
+
+    /* Header de alerta */
+    .alerta-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .alerta-titulo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+    }
+
+    .alerta-titulo h3 {
+        margin: 0;
+        color: #333;
+        font-size: 1.3rem;
+    }
+
+    .alerta-icono {
+        font-size: 1.5rem;
+    }
+
+    .alerta-acciones {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .estado-leida {
+        color: #28a745;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Contenido */
+    .alerta-contenido {
+        margin-bottom: 1.5rem;
+    }
+
+    .alerta-contenido p {
+        margin: 0;
+        color: #555;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    /* Metadata */
+    .alerta-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .meta-label {
+        font-weight: 600;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .meta-fecha {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* Badges */
+    .badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+    }
+
+    .badge-urgente { background-color: #dc3545; }
+    .badge-advertencia { background-color: #ffc107; color: #000; }
+    .badge-informativa { background-color: #17a2b8; }
+
+    .badge-prioridad-urgente { background-color: #dc3545; }
+    .badge-prioridad-alta { background-color: #fd7e14; }
+    .badge-prioridad-media { background-color: #ffc107; color: #000; }
+    .badge-prioridad-baja { background-color: #28a745; }
+
+    .badge-destinatario {
+        background-color: #6c757d;
+    }
+
+    /* Indicador de nuevo */
+    .nuevo-indicador {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #dc3545;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Estado vacío */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #666;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 1rem 0;
+        color: #333;
+    }
+
+    .empty-state p {
+        margin: 0.5rem 0;
+        line-height: 1.5;
+    }
+
+    /* Navegación */
+    .alertas-navigation {
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    /* Botones mejorados */
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .alertas-controls {
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        .alertas-stats {
+            justify-content: space-around;
+        }
+
+        .filtros-alertas {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .alerta-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .alerta-acciones {
+            justify-content: flex-end;
+        }
+
+        .alerta-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .alertas-stats {
+            gap: 1rem;
+        }
+
+        .stat-item {
+            flex: 1;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filtrado de alertas
+        const filtroTipo = document.getElementById('filtro-tipo');
+        const filtroEstado = document.getElementById('filtro-estado');
+        const alertasItems = document.querySelectorAll('.alerta-item');
+
+        function filtrarAlertas() {
+            const tipoSeleccionado = filtroTipo.value;
+            const estadoSeleccionado = filtroEstado.value;
+
+            alertasItems.forEach(item => {
+                const tipo = item.getAttribute('data-tipo');
+                const estado = item.getAttribute('data-estado');
+                
+                let mostrar = true;
+
+                // Filtrar por tipo
+                if (tipoSeleccionado !== 'todos' && tipo !== tipoSeleccionado) {
+                    mostrar = false;
+                }
+
+                // Filtrar por estado
+                if (estadoSeleccionado !== 'todos' && estado !== estadoSeleccionado) {
+                    mostrar = false;
+                }
+
+                // Mostrar/ocultar elemento
+                item.style.display = mostrar ? 'block' : 'none';
+            });
+        }
+
+        // Event listeners para los filtros
+        filtroTipo.addEventListener('change', filtrarAlertas);
+        filtroEstado.addEventListener('change', filtrarAlertas);
+
+        // Animación de entrada para las alertas
+        alertasItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                item.style.transition = 'all 0.5s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}

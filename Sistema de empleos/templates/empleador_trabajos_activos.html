@@ -1,0 +1,1208 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Header de la página -->
+<div class="page-header">
+    <div class="container">
+        <div class="header-content">
+            <h1 class="page-title">Gestión de Trabajos Activos</h1>
+            <p class="page-subtitle">Administra tus colaboraciones en curso y finalizadas</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat">
+                <div class="stat-number">{{ trabajos_activos|length }}</div>
+                <div class="stat-label">En Curso</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">{{ trabajos_finalizados|length }}</div>
+                <div class="stat-label">Finalizados</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">{{ total_colaboraciones }}</div>
+                <div class="stat-label">Total</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navegación -->
+<section class="section">
+    <div class="container">
+        <div class="navigation-actions">
+            <a href="{{ url_for('dashboard_empleador') }}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i>
+                Volver al Dashboard
+            </a>
+            <div class="view-toggle">
+                <button class="toggle-btn active" data-view="active">
+                    <i class="fas fa-play-circle"></i>
+                    Trabajos Activos
+                </button>
+                <button class="toggle-btn" data-view="completed">
+                    <i class="fas fa-check-circle"></i>
+                    Trabajos Finalizados
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trabajos Activos -->
+<section class="section active-view" id="activeView">
+    <div class="container">
+        <div class="section-header">
+            <h2>
+                <i class="fas fa-users"></i>
+                Trabajos en Curso
+            </h2>
+            <span class="section-badge">{{ trabajos_activos|length }} activos</span>
+        </div>
+
+        {% if trabajos_activos %}
+        <div class="active-jobs-grid">
+            {% for trabajo in trabajos_activos %}
+            <div class="active-job-card">
+                <!-- Header del trabajo -->
+                <div class="job-header">
+                    <div class="job-title-section">
+                        <h3 class="job-title">{{ trabajo.titulo }}</h3>
+                        <div class="job-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                Iniciado: {{ trabajo.fecha_inicio[:10] }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-money-bill-wave"></i>
+                                S/ {{ trabajo.pago }}/hora
+                            </span>
+                        </div>
+                    </div>
+                    <div class="job-status">
+                        <span class="status-badge status-active">
+                            <i class="fas fa-circle"></i>
+                            En Progreso
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Información del estudiante -->
+                <div class="student-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-user-graduate"></i>
+                        Información del Estudiante
+                    </h4>
+                    <div class="student-profile">
+                        <div class="student-avatar">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="student-info">
+                            <h5 class="student-name">
+                                {{ trabajo.usuario_info.nombres }} {{ trabajo.usuario_info.apellidos }}
+                            </h5>
+                            <div class="student-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-university"></i>
+                                    <span>{{ trabajo.usuario_info.universidad }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>{{ trabajo.usuario_info.carrera }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles del trabajo -->
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <div class="detail-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="detail-content">
+                            <span class="detail-label">Horario</span>
+                            <span class="detail-value">{{ trabajo.horario_trabajo }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="detail-content">
+                            <span class="detail-label">Ubicación</span>
+                            <span class="detail-value">{{ trabajo.ubicacion }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="detail-content">
+                            <span class="detail-label">Descripción</span>
+                            <span class="detail-value">{{ trabajo.descripcion[:100] }}{% if trabajo.descripcion|length > 100 %}...{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de contacto -->
+                <div class="contact-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-address-book"></i>
+                        Información de Contacto
+                    </h4>
+                    <div class="contact-grid">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <span class="contact-label">Email</span>
+                                <a href="mailto:{{ trabajo.usuario_info.email }}" class="contact-value">
+                                    {{ trabajo.usuario_info.email }}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <span class="contact-label">Teléfono</span>
+                                <a href="tel:{{ trabajo.usuario_info.telefono }}" class="contact-value">
+                                    {{ trabajo.usuario_info.telefono }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="actions-section">
+                    <div class="primary-actions">
+                        <a href="{{ url_for('calificar_usuario', trabajo_activo_id=trabajo.id) }}" 
+                            class="btn" style="background-color: #ffc107;">
+                            ⭐ Calificar Desempeño
+                        </a>
+                        <a href="{{ url_for('iniciar_chat', user_id=trabajo.usuario_id) }}" 
+                           class="btn btn-primary action-btn">
+                            <i class="fas fa-envelope"></i>
+                            Enviar Mensaje
+                        </a>
+                    </div>
+                    <div class="secondary-actions">
+                        <a href="tel:{{ trabajo.usuario_info.telefono }}" 
+                           class="btn btn-outline btn-sm">
+                            <i class="fas fa-phone"></i>
+                            Llamar
+                        </a>
+                        <a href="{{ url_for('crear_reporte', tipo_usuario='usuario', user_id=trabajo.usuario_id) }}" 
+                           class="btn btn-outline btn-sm report-btn">
+                            <i class="fas fa-flag"></i>
+                            Reportar
+                        </a>
+                        <button class="btn btn-outline btn-sm details-btn" data-job-id="{{ trabajo.id }}">
+                            <i class="fas fa-info-circle"></i>
+                            Detalles
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Estado vacío para trabajos activos -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3>No tienes trabajos activos</h3>
+            <p>Los trabajos aparecerán aquí cuando aceptes postulaciones de estudiantes.</p>
+            <div class="empty-actions">
+                <a href="{{ url_for('ver_trabajos') }}" class="btn btn-primary">
+                    <i class="fas fa-briefcase"></i>
+                    Ver Trabajos Publicados
+                </a>
+                <a href="{{ url_for('publicar_trabajo') }}" class="btn btn-outline">
+                    <i class="fas fa-plus"></i>
+                    Publicar Nuevo Trabajo
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Trabajos Finalizados -->
+<section class="section completed-view" id="completedView" style="display: none;">
+    <div class="container">
+        <div class="section-header">
+            <h2>
+                <i class="fas fa-check-circle"></i>
+                Trabajos Finalizados
+            </h2>
+            <span class="section-badge">{{ trabajos_finalizados|length }} finalizados</span>
+        </div>
+
+        {% if trabajos_finalizados %}
+        <div class="completed-jobs-table">
+            <div class="table-container">
+                <table class="jobs-table">
+                    <thead>
+                        <tr>
+                            <th>Trabajo</th>
+                            <th>Estudiante</th>
+                            <th>Universidad</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Duración</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trabajo in trabajos_finalizados %}
+                        <tr>
+                            <td>
+                                <div class="job-info">
+                                    <strong class="job-title">{{ trabajo.titulo }}</strong>
+                                    <span class="job-description">{{ trabajo.descripcion[:50] }}...</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-info">
+                                    <strong>{{ trabajo.usuario_info.nombres }} {{ trabajo.usuario_info.apellidos }}</strong>
+                                    <span class="student-email">{{ trabajo.usuario_info.email }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="university">{{ trabajo.usuario_info.universidad }}</span>
+                            </td>
+                            <td>
+                                <span class="date">{{ trabajo.fecha_inicio[:10] }}</span>
+                            </td>
+                            <td>
+                                <span class="date">
+                                    {% if trabajo.fecha_finalizacion %}
+                                        {{ trabajo.fecha_finalizacion[:10] }}
+                                    {% else %}
+                                        <em>No especificada</em>
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="duration">
+                                    {% if trabajo.fecha_finalizacion %}
+                                        {{ calcular_duracion(trabajo.fecha_inicio, trabajo.fecha_finalizacion) }}
+                                    {% else %}
+                                        <em>N/A</em>
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('calificar_usuario', trabajo_activo_id=trabajo.id) }}" 
+                                       class="btn btn-outline btn-sm"
+                                       title="Calificar">
+                                        <i class="fas fa-star"></i>
+                                    </a>
+                                    <a href="{{ url_for('iniciar_chat', user_id=trabajo.usuario_id) }}" 
+                                       class="btn btn-outline btn-sm"
+                                       title="Contactar">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    <button class="btn btn-outline btn-sm view-details-btn"
+                                            data-job-id="{{ trabajo.id }}"
+                                            title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Resumen de trabajos finalizados -->
+        <div class="summary-section">
+            <div class="summary-card">
+                <h4>Resumen de Colaboraciones</h4>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="summary-content">
+                            <span class="summary-value">{{ total_duracion }}</span>
+                            <span class="summary-label">Total de horas trabajadas</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="summary-content">
+                            <span class="summary-value">S/ {{ total_ingresos }}</span>
+                            <span class="summary-label">Total pagado a estudiantes</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="summary-content">
+                            <span class="summary-value">{{ estudiantes_unicos }}</span>
+                            <span class="summary-label">Estudiantes diferentes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Estado vacío para trabajos finalizados -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>No hay trabajos finalizados</h3>
+            <p>Los trabajos completados aparecerán aquí una vez que finalicen las colaboraciones activas.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Modal de Detalles -->
+<div class="modal" id="detailsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Detalles del Trabajo</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modalContent">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Header de la página */
+    .page-header {
+        background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
+        color: white;
+        padding: var(--space-8) 0;
+        margin-bottom: var(--space-8);
+    }
+
+    .header-content {
+        text-align: center;
+        margin-bottom: var(--space-6);
+    }
+
+    .page-title {
+        font-size: var(--font-size-3xl);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--space-2);
+        line-height: var(--line-height-tight);
+    }
+
+    .page-subtitle {
+        font-size: var(--font-size-lg);
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .header-stats {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-8);
+    }
+
+    .stat {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: var(--font-size-3xl);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--space-2);
+    }
+
+    .stat-label {
+        font-size: var(--font-size-sm);
+        opacity: 0.8;
+    }
+
+    /* Navegación */
+    .navigation-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-6);
+        flex-wrap: wrap;
+        gap: var(--space-4);
+    }
+
+    .view-toggle {
+        display: flex;
+        background: var(--gray-100);
+        border-radius: var(--radius);
+        padding: var(--space-1);
+    }
+
+    .toggle-btn {
+        padding: var(--space-3) var(--space-4);
+        border: none;
+        background: transparent;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .toggle-btn.active {
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Secciones */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-6);
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: var(--font-size-2xl);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .section-badge {
+        background: var(--primary-100);
+        color: var(--primary-700);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-lg);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    /* Tarjetas de trabajos activos */
+    .active-jobs-grid {
+        display: grid;
+        gap: var(--space-6);
+    }
+
+    .active-job-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        box-shadow: var(--shadow);
+        transition: all var(--transition-normal);
+    }
+
+    .active-job-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--space-4);
+        padding-bottom: var(--space-4);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .job-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-semibold);
+        margin-bottom: var(--space-2);
+        color: var(--gray-900);
+    }
+
+    .job-meta {
+        display: flex;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--font-size-sm);
+        color: var(--gray-600);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-lg);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    .status-active {
+        background: var(--success-100);
+        color: var(--success-700);
+    }
+
+    .status-active i {
+        font-size: var(--font-size-xs);
+        color: var(--success-500);
+    }
+
+    /* Sección del estudiante */
+    .section-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        margin-bottom: var(--space-3);
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .student-profile {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        padding: var(--space-4);
+        background: var(--gray-50);
+        border-radius: var(--radius);
+    }
+
+    .student-avatar {
+        width: 60px;
+        height: 60px;
+        background: var(--primary-500);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: var(--font-size-xl);
+        flex-shrink: 0;
+    }
+
+    .student-name {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        margin-bottom: var(--space-2);
+        color: var(--gray-900);
+    }
+
+    .student-details {
+        display: flex;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--font-size-sm);
+        color: var(--gray-600);
+    }
+
+    /* Grid de detalles */
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-4);
+        margin: var(--space-4) 0;
+    }
+
+    .detail-card {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        background: var(--gray-50);
+        border-radius: var(--radius);
+    }
+
+    .detail-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-500);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: var(--font-size-lg);
+        flex-shrink: 0;
+    }
+
+    .detail-label {
+        display: block;
+        font-size: var(--font-size-sm);
+        color: var(--gray-500);
+        margin-bottom: var(--space-1);
+    }
+
+    .detail-value {
+        display: block;
+        font-weight: var(--font-weight-medium);
+        color: var(--gray-700);
+    }
+
+    /* Sección de contacto */
+    .contact-section {
+        margin: var(--space-4) 0;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--space-4);
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        background: var(--gray-50);
+        border-radius: var(--radius);
+    }
+
+    .contact-item i {
+        width: 20px;
+        color: var(--primary-500);
+        text-align: center;
+    }
+
+    .contact-label {
+        display: block;
+        font-size: var(--font-size-sm);
+        color: var(--gray-500);
+        margin-bottom: var(--space-1);
+    }
+
+    .contact-value {
+        display: block;
+        font-weight: var(--font-weight-medium);
+        color: var(--primary-600);
+        text-decoration: none;
+    }
+
+    .contact-value:hover {
+        text-decoration: underline;
+    }
+
+    /* Acciones */
+    .actions-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-4);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--gray-200);
+        flex-wrap: wrap;
+    }
+
+    .primary-actions {
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        min-width: 160px;
+    }
+
+    .secondary-actions {
+        display: flex;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+    }
+
+    /* Tabla de trabajos finalizados */
+    .completed-jobs-table {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .jobs-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .jobs-table th {
+        background: var(--gray-50);
+        padding: var(--space-4);
+        text-align: left;
+        font-weight: var(--font-weight-semibold);
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .jobs-table td {
+        padding: var(--space-4);
+        border-bottom: 1px solid var(--gray-200);
+        vertical-align: top;
+    }
+
+    .jobs-table tr:hover {
+        background: var(--gray-50);
+    }
+
+    .job-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .job-title {
+        font-weight: var(--font-weight-semibold);
+        color: var(--gray-900);
+        margin-bottom: var(--space-1);
+    }
+
+    .job-description {
+        font-size: var(--font-size-sm);
+        color: var(--gray-600);
+    }
+
+    .student-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .student-email {
+        font-size: var(--font-size-sm);
+        color: var(--gray-500);
+        margin-top: var(--space-1);
+    }
+
+    .university {
+        font-size: var(--font-size-sm);
+        color: var(--gray-600);
+    }
+
+    .date {
+        font-size: var(--font-size-sm);
+        color: var(--gray-600);
+    }
+
+    .duration {
+        font-size: var(--font-size-sm);
+        color: var(--gray-600);
+        font-weight: var(--font-weight-medium);
+    }
+
+    .table-actions {
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    /* Resumen */
+    .summary-section {
+        margin-top: var(--space-8);
+    }
+
+    .summary-card {
+        background: white;
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+    }
+
+    .summary-card h4 {
+        margin-bottom: var(--space-4);
+        color: var(--gray-700);
+        text-align: center;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-6);
+    }
+
+    .summary-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        text-align: center;
+    }
+
+    .summary-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--primary-500);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: var(--font-size-xl);
+        flex-shrink: 0;
+    }
+
+    .summary-value {
+        display: block;
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--gray-900);
+        margin-bottom: var(--space-1);
+    }
+
+    .summary-label {
+        display: block;
+        font-size: var(--font-size-sm);
+        color: var(--gray-600);
+    }
+
+    /* Estados vacíos */
+    .empty-state {
+        text-align: center;
+        padding: var(--space-12) var(--space-6);
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+    }
+
+    .empty-icon {
+        font-size: var(--font-size-4xl);
+        color: var(--gray-400);
+        margin-bottom: var(--space-6);
+    }
+
+    .empty-state h3 {
+        margin-bottom: var(--space-2);
+        color: var(--gray-700);
+    }
+
+    .empty-state p {
+        color: var(--gray-600);
+        margin-bottom: var(--space-6);
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .empty-actions {
+        display: flex;
+        gap: var(--space-4);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background: white;
+        margin: 5% auto;
+        padding: 0;
+        border-radius: var(--radius-lg);
+        width: 90%;
+        max-width: 600px;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-6);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .modal-header h3 {
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: var(--font-size-2xl);
+        cursor: pointer;
+        color: var(--gray-500);
+    }
+
+    .modal-body {
+        padding: var(--space-6);
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: var(--font-size-2xl);
+        }
+        
+        .header-stats {
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+        
+        .navigation-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .view-toggle {
+            width: 100%;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .job-header {
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+        
+        .student-profile {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .actions-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .primary-actions {
+            justify-content: center;
+        }
+        
+        .secondary-actions {
+            justify-content: center;
+        }
+        
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .empty-actions {
+            flex-direction: column;
+        }
+        
+        .empty-actions .btn {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-header {
+            padding: var(--space-6) 0;
+        }
+        
+        .active-job-card {
+            padding: var(--space-4);
+        }
+        
+        .job-meta {
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+        
+        .student-details {
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+        
+        .primary-actions {
+            flex-direction: column;
+        }
+        
+        .action-btn {
+            width: 100%;
+        }
+        
+        .table-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle entre vistas
+        const toggleButtons = document.querySelectorAll('.toggle-btn');
+        const activeView = document.getElementById('activeView');
+        const completedView = document.getElementById('completedView');
+
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const view = this.getAttribute('data-view');
+                
+                // Actualizar botones activos
+                toggleButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Mostrar vista correspondiente
+                if (view === 'active') {
+                    activeView.style.display = 'block';
+                    completedView.style.display = 'none';
+                } else {
+                    activeView.style.display = 'none';
+                    completedView.style.display = 'block';
+                }
+            });
+        });
+
+        // Modal de detalles
+        const detailsButtons = document.querySelectorAll('.details-btn, .view-details-btn');
+        const detailsModal = document.getElementById('detailsModal');
+        const modalClose = detailsModal.querySelector('.modal-close');
+        const modalContent = document.getElementById('modalContent');
+
+        detailsButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const jobId = this.getAttribute('data-job-id');
+                // En una implementación real, aquí se cargarían los detalles del trabajo
+                loadJobDetails(jobId);
+                detailsModal.style.display = 'block';
+            });
+        });
+
+        modalClose.addEventListener('click', function() {
+            detailsModal.style.display = 'none';
+        });
+
+        // Cerrar modal al hacer click fuera
+        window.addEventListener('click', function(e) {
+            if (e.target === detailsModal) {
+                detailsModal.style.display = 'none';
+            }
+        });
+
+        function loadJobDetails(jobId) {
+            // Simular carga de detalles
+            modalContent.innerHTML = `
+                <div class="loading-details">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando detalles del trabajo...</p>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                modalContent.innerHTML = `
+                    <div class="job-details">
+                        <h4>Detalles completos del trabajo</h4>
+                        <p>Aquí se mostraría información detallada sobre el trabajo, incluyendo:</p>
+                        <ul>
+                            <li>Descripción completa</li>
+                            <li>Historial de mensajes</li>
+                            <li>Calificaciones y reviews</li>
+                            <li>Documentos adjuntos</li>
+                            <li>Linea de tiempo del proyecto</li>
+                        </ul>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        // Confirmación para acciones importantes
+        document.querySelectorAll('.report-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('¿Estás seguro de que quieres reportar a este usuario?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Animación de entrada para las tarjetas
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.active-job-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Contadores animados en el header
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach(stat => {
+            const finalValue = parseInt(stat.textContent);
+            let currentValue = 0;
+            const duration = 1500;
+            const step = finalValue / (duration / 16);
+            
+            const updateCounter = () => {
+                currentValue += step;
+                if (currentValue < finalValue) {
+                    stat.textContent = Math.ceil(currentValue);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    stat.textContent = finalValue;
+                }
+            };
+            
+            updateCounter();
+        });
+
+        // Ordenamiento de la tabla
+        const tableHeaders = document.querySelectorAll('.jobs-table th');
+        tableHeaders.forEach((header, index) => {
+            if (index < tableHeaders.length - 1) { // Excluir columna de acciones
+                header.style.cursor = 'pointer';
+                header.addEventListener('click', function() {
+                    sortTable(index);
+                });
+            }
+        });
+
+        function sortTable(columnIndex) {
+            // En una implementación real, aquí se ordenaría la tabla
+            console.log('Ordenar por columna:', columnIndex);
+        }
+    });
+</script>
+{% endblock %}
